@@ -1,0 +1,2692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1A1A2E"> <!-- Dark theme color -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TRADE X AI">
+    <link rel="apple-touch-icon" href="[https://placehold.co/180x180/1A1A2E/FFFFFF?text=TXAI](https://placehold.co/180x180/1A1A2E/FFFFFF?text=TXAI)">
+    <!-- End PWA Meta Tags -->
+
+    <title>TRADE X AI - Viewer</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap)" rel="stylesheet">
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css)">
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css](https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css)">
+    <style>
+        :root {
+            --bg-primary: #1A1A2E; /* Dark Blue/Black */
+            --bg-secondary: #0F0F1A; /* Even Darker Blue/Black */
+            --bg-tertiary: #2C2C3E; /* Slightly Lighter Dark Blue */
+            --text-primary: #E0E0E0; /* Light Gray */
+            --text-secondary: #A0A0B0; /* Medium Gray */
+            --accent-primary: #6D28D9; /* Deep Purple */
+            --accent-secondary: #A78BFA; /* Light Purple */
+            --card-border-color: #3A3A4A; /* Darker border */
+            --shadow-color: rgba(0, 0, 0, 0.4); /* Darker shadow */
+            --shadow-accent-glow: rgba(109, 40, 217, 0.3); /* More pronounced glow */
+
+            --win-color: #22c55e; /* Green */
+            --loss-color: #ef4444; /* Red */
+            --jack-win-color: #f59e0b; /* Amber */
+            --result-color: #3B82F6; /* Blue */
+            --pending-color: #F97316; /* Orange */
+            --maintenance-text-color: #6D28D9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        * {
+            color: var(--text-primary);
+        }
+
+        .auth-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 95vh;
+            padding: 1rem;
+            animation: fadeInAuth 0.7s ease-out;
+        }
+        .auth-screen.active {
+            display: flex;
+        }
+        @keyframes fadeInAuth {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-container {
+            background: var(--bg-primary);
+            padding: 2rem 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid var(--card-border-color);
+        }
+
+        .auth-title-svg { 
+            width: 100%;
+            max-width: 350px; 
+            margin: 0 auto 1.5rem auto;
+        }
+        
+        .auth-title-svg svg text {
+            font-family: 'Inter', sans-serif;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            text-transform: uppercase;
+            animation: strokeAppHeaderAuraX 5s infinite alternate;
+            stroke-width: 1;
+            stroke: var(--accent-primary);
+            font-size: 100px; /* Adjusted for longer name */
+            fill: rgba(255, 255, 255, 0);
+            font-weight: 700;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 1px solid var(--card-border-color);
+            border-radius: 1rem; 
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--shadow-accent-glow);
+        }
+        
+        .auth-button { 
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #fff;
+            padding: 0.9rem 1.8rem; border-radius: 1rem; font-weight: 600;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            box-shadow: 0 5px 12px var(--shadow-color); width: 100%;
+        }
+        .auth-button:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 18px var(--shadow-accent-glow);
+        }
+        .auth-button:disabled {
+            background: #adb5bd; color: var(--text-secondary);
+            cursor: not-allowed; opacity: 0.8;
+        }
+        
+        .device-id-display {
+            background-color: var(--bg-tertiary);
+            border: 1px dashed var(--card-border-color);
+            color: var(--text-secondary);
+            padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;
+            text-align: left; font-size: 0.9rem;
+        }
+        .device-id-display strong {
+            font-weight: 600; user-select: all; cursor: pointer;
+            word-break: break-all; color: var(--accent-primary); 
+        }
+
+        .copy-btn-sm {
+            background: none; border: none; color: var(--accent-primary); 
+            cursor: pointer; font-size: 0.9em; margin-left: 0.5rem;
+        }
+        .copy-feedback { 
+            display: none; color: var(--win-color); font-size: 0.75rem;
+            margin-left: 0.5rem; font-weight: 500; opacity: 0;
+        }
+        .copy-feedback.show { display: inline; animation: fadeInOutFeedback 2.5s forwards; }
+        @keyframes fadeInOutFeedback { 
+          0% { opacity: 0; transform: translateY(5px); }
+          20% { opacity: 1; transform: translateY(0); }
+          80% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-5px); }
+        }
+
+
+        .status-message-container {
+            margin-top: 1.5rem; padding: 0.75rem; border-radius: 1rem;
+            font-size: 0.9rem; min-height: 60px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            border: 1px solid var(--card-border-color);
+        }
+        .status-pending { background-color: #3E3E2E; color: #E0A000; } /* Darker pending */
+        .status-approved { background-color: #2E3E3E; color: #06D08E; } /* Darker approved */
+        .status-rejected { background-color: #3E2E2E; color: #E05050; } /* Darker rejected */
+        .status-expired { background-color: #3E3E2E; color: #E0A000; } /* Darker expired */
+        .status-info { background-color: var(--bg-tertiary); color: var(--text-secondary); }
+
+
+        .auth-footer-link { margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-secondary); }
+        .auth-footer-link a { color: var(--accent-primary); text-decoration: none; font-weight: 500; }
+        .auth-footer-link a:hover { text-decoration: underline; color: var(--accent-secondary); }
+
+        #maintenanceContainer { display: none; width:100%; max-width:450px; padding:2rem; margin: auto; animation: fadeIn 0.8s ease-in-out;}
+        #maintenanceContainer.active { display: flex; align-items: center; justify-content: center; flex-grow: 1;}
+        .maintenance-card { background: var(--bg-primary); border-radius: 1.5rem; box-shadow: 0 10px 25px var(--shadow-color); padding: 2.5rem; border: 1px solid var(--card-border-color); text-align: center;}
+        .maintenance-card i { font-size: 3rem; color: var(--maintenance-text-color); margin-bottom: 1rem; }
+        .maintenance-card h2 { color: var(--maintenance-text-color); margin-bottom: 0.5rem; }
+
+        #appContainer { display: none; width: 100%; }
+        #appContainer.active { display: block; }
+
+        .popup, .modal { 
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); background: rgba(26, 26, 46, 0.85); /* Darker popup background */
+            padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 10px 30px var(--shadow-color);
+            backdrop-filter: blur(10px); z-index: 1000; width: 90%; max-width: 400px;
+            border: 1px solid var(--card-border-color);
+        }
+
+        .popup.active, .modal.active { display: block; animation: fadeInPopup 0.3s ease-out; }
+        @keyframes fadeInPopup { from { opacity: 0; transform: translate(-50%, -48%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+
+        .card {
+            transition: all 0.3s ease; background: var(--bg-primary);
+            border-radius: 1.5rem; box-shadow: 0 8px 16px var(--shadow-color);
+            position: relative; margin: 0.75rem;
+            overflow: hidden; border: 1px solid var(--card-border-color);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px var(--shadow-accent-glow);
+            border-color: var(--accent-secondary);
+        }
+        .gradient-bg { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); }
+        #appHeaderSvgContainer svg { width: 100%; height: auto; margin: 0 auto; display: block; }
+        #appHeaderSvgContainer svg text {
+            font-family: 'Inter', sans-serif;
+            text-anchor: middle; dominant-baseline: middle; text-transform: uppercase;
+            animation: strokeAppHeaderAuraX 5s infinite alternate; stroke-width: 1;
+            stroke: var(--accent-primary); font-size: 110px; fill: rgba(255, 255, 255, 0); font-weight: 700;
+        }
+        @media (max-width: 768px) { #appHeaderSvgContainer svg text { font-size: 90px; } }
+        @keyframes strokeAppHeaderAuraX {
+            0% { fill: rgba(255, 255, 255, 0); stroke: var(--accent-secondary); stroke-dashoffset: 25%; stroke-dasharray: 0 50%; stroke-width: 1.5; }
+            70% { fill: rgba(255, 255, 255, 0); stroke: var(--accent-primary); }
+            80% { fill: rgba(255, 255, 255, 0); stroke: var(--accent-secondary); stroke-width: 2; }
+            100% { fill: var(--text-primary); stroke: rgba(109, 40, 217, 0); stroke-dashoffset: -25%; stroke-dasharray: 50% 0; stroke-width: 0; }
+        }
+        .history-container { display: flex; flex-direction: column; gap: 1rem; max-height: none; overflow: visible; position: relative; }
+        .history-item {
+            transition: all 0.3s ease; width: 100%; max-width: 100%; margin: 0; border-radius: 1.2rem;
+            background: var(--bg-primary);
+            box-shadow: 0 4px 10px var(--shadow-color); position: relative; overflow: hidden; padding: 1.2rem;
+            border-left: 4px solid var(--card-border-color);
+        }
+        .history-item.win { border-left-color: var(--win-color); }
+        .history-item.loss { border-left-color: var(--loss-color); }
+        .history-item.jack-win { 
+            border-left-color: var(--jack-win-color); 
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), var(--bg-primary));
+        }
+        .history-item.pending { border-left-color: var(--pending-color); }
+        .history-item:hover { transform: scale(1.02); box-shadow: 0 6px 18px var(--shadow-accent-glow); }
+        
+        .delete-btn { color: var(--text-secondary); background: var(--bg-tertiary); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
+        .delete-btn:hover { color: #fff; background: var(--accent-primary); transform: scale(1.1); }
+        
+        .status-icon {
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; position: relative; overflow: hidden; background-color: var(--bg-secondary);
+        }
+        .win-icon { color: var(--win-color); }
+        .loss-icon { color: var(--loss-color); }
+        .jack-win-icon { color: var(--jack-win-color); animation: pulseJackpot 1s infinite;}
+        .pending-icon { color: var(--pending-color); animation: rotate 2s infinite linear; }
+        
+        @keyframes pulseJackpot {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .dashboard-card {
+            background: var(--bg-primary); border-radius: 1.5rem; padding: 1.2rem;
+            box-shadow: 0 4px 10px var(--shadow-color); transition: all 0.3s ease;
+            border: 1px solid var(--card-border-color);
+        }
+        .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 6px 14px var(--shadow-accent-glow); border-color: var(--accent-primary); }
+        
+        .navigation {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 380px; height: 70px; background: rgba(26, 26, 46, 0.8); /* Darker navigation background */
+            backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%);
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 1.5rem; box-shadow: 0 8px 32px var(--shadow-color); z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border for contrast */
+        }
+        .navigation ul { display: flex; width: 100%; padding: 0 20px;}
+        .navigation ul li { position: relative; list-style: none; width: 25%; height: 70px; z-index: 1; display:flex; align-items:center; justify-content:center; }
+        .navigation ul li a { position: relative; display: flex; justify-content: center; align-items: center; flex-direction: column; width: 100%; text-align: center; font-weight: 500; }
+        .navigation ul li a .icon { position: relative; display: block; line-height: 1; font-size: 1.5em; text-align: center; transition: 0.3s ease; color: var(--text-secondary); }
+        .navigation ul li.active a .icon { transform: translateY(-10px); color: var(--accent-primary); }
+        .navigation ul li a .text { position: absolute; font-weight: 500; font-size: 0.75em; letter-spacing: 0.05em; transition: 0.3s ease; opacity: 0; transform: translateY(20px); color: var(--accent-primary); }
+        .navigation ul li.active a .text { opacity: 1; transform: translateY(18px); }
+        
+        .period-id { font-family: 'SF Mono', 'Courier New', monospace; letter-spacing: 1px; font-size: 1.2rem; color: #fff; }
+        #currentPeriod, #currentPrediction {
+            border: 1px solid rgba(255, 255, 255, 0.3) !important; 
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: #fff !important; 
+            box-shadow: none; 
+            font-weight: 600;
+        }
+
+        button, .btn {
+           background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+           color: #fff; border-radius: 0.75rem; font-weight: 600; padding: 0.75rem 1.5rem;
+           transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 15px var(--shadow-accent-glow);
+        }
+        button:hover, .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow-accent-glow); }
+        #cancelModalBtn { background: var(--bg-tertiary); color: var(--text-secondary); }
+        #cancelModalBtn:hover { background: #3A3A4A; } /* Darker hover for cancel */
+        
+        .content-section { display: none; } 
+        .content-section.active { display: block; animation: fadeInContent 0.4s ease-in-out; }
+        @keyframes fadeInContent { from { opacity: 0; } to { opacity: 1; } }
+
+        .analysis-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+             gap: 1rem;
+        }
+        
+        @media (max-width: 768px) { 
+             .navigation { width: calc(100% - 40px); }
+             .navigation ul { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+        IMPORTANT: This application is designed to be served from a web server (e.g., using `http-server` or deployed to a hosting service).
+        Running it directly from the file system (file:/// protocol) will cause security errors related to:
+        - Loading external scripts and stylesheets (CORS policy)
+        - Service Worker registration
+        - Accessing local manifest.json
+        Please use a local development server for testing.
+    -->
+    <!-- Login Pages -->
+    <div id="loginPage1" class="auth-screen active">
+        <div class="auth-container">
+            <div class="auth-title-svg">
+                <svg viewBox="0 0 800 120"><text x="50%" y="50%">TRADE X AI</text></svg>
+            </div>
+            <p class="text-text-secondary mb-4">Enter your Telegram Username to begin.</p>
+            <input type="text" id="telegramUsernameInput" class="form-input" placeholder="YourTelegramUsername (no @)">
+            <button id="submitUsernameBtn" class="auth-button mt-4">Continue</button>
+            <p id="usernameError" class="text-xs mt-2 text-red-500" style="display: none;">Please enter a valid username.</p>
+        </div>
+    </div>
+
+    <div id="loginPage2" class="auth-screen">
+        <div class="auth-container">
+            <h2 class="text-xl font-semibold text-center mb-2 text-text-primary">Device Verification</h2>
+            <p class="text-text-secondary mb-4">Your unique Device ID is below. Share it with the admin for approval.</p>
+            
+            <div class="device-id-display">
+                <p>Your Device ID:</p>
+                <p>
+                    <strong id="displayedDeviceId">Loading...</strong>
+                    <button id="copyDeviceIdBtn" class="copy-btn-sm" title="Copy Device ID"><i class="fas fa-copy"></i></button>
+                    <span id="copyFeedback" class="copy-feedback">Copied!</span>
+                </p>
+            </div>
+            
+            <div id="approvalStatusContainer" class="status-message-container status-info">
+                <i class="fas fa-spinner fa-spin mr-2"></i> Checking status...
+            </div>
+
+            <button id="logoutFromDevicePageBtn" class="auth-button w-full mt-6" style="background: var(--text-secondary);">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </button>
+            <p class="auth-footer-link">Need help? Contact <a href="[https://t.me/TRADEXAIADMIN](https://t.me/TRADEXAIADMIN)" target="_blank" rel="noopener noreferrer">Support</a>.</p>
+        </div>
+    </div>
+
+
+    <div id="maintenanceContainer">
+        <div class="maintenance-card">
+            <i class="fas fa-tools"></i>
+            <h2 class="text-2xl font-bold mb-2">Under Maintenance</h2>
+            <p id="maintenanceMessage" class="text-text-secondary">The platform is currently undergoing scheduled maintenance. Please try again later.</p>
+        </div>
+    </div>
+
+    <div id="appContainer" class="pb-24">
+        <header id="appHeaderSvgContainer" class="text-center mt-0 mb-2 animate__animated animate__fadeInDown">
+            <svg viewBox="0 0 800 120">
+                <text x="50%" y="50%">TRADE X AI</text>
+            </svg>
+        </header>
+        <div class="max-w-full mx-auto p-2 w-full">
+            <div class="max-w-4xl mx-auto p-2 w-full">
+                <div id="homeSection" class="content-section">
+                    <div class="card mb-4 overflow-hidden gradient-bg relative">
+                        <div class="bg-white/20 backdrop-blur-sm p-6 rounded-lg">
+                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-white">
+                                 <div class="relative text-center">
+                                    <div class="px-2">
+                                        <div class="flex items-center justify-center space-x-3 mb-2">
+                                            <i class="fa-solid fa-clock text-xl"></i>
+                                            <h2 class="text-xl font-bold" data-lang-key="period">Period</h2>
+                                        </div>
+                                        <p id="currentPeriod" class="text-xl font-semibold p-3 rounded-lg period-id">-</p>
+                                    </div>
+                                </div>
+                                <div class="relative text-center">
+                                    <div class="px-2">
+                                        <div class="flex items-center justify-center space-x-3 mb-2">
+                                             <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                                            <h2 class="text-xl font-bold" data-lang-key="prediction">Prediction</h2>
+                                        </div>
+                                        <p id="currentPrediction" class="text-xl font-semibold p-3 rounded-lg">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4 p-6 relative">
+                        <h2 class="text-3xl font-bold text-center mb-4 relative text-accent-primary">
+                            <span class="relative z-10" data-lang-key="analysis_dashboard">Analysis Dashboard</span>
+                        </h2>
+                         <div class="analysis-grid">
+                            <div class="dashboard-card">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-star text-lg text-accent-primary"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="most_frequent_bs">Most Frequent (B/S)</p>
+                                        <p id="mostFrequentBigSmall" class="text-xl font-bold text-text-primary">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-arrow-down text-lg text-accent-primary"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="least_frequent_bs">Least Frequent (B/S)</p>
+                                        <p id="leastFrequentBigSmall" class="text-xl font-bold text-text-primary">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="dashboard-card flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-server text-lg text-accent-primary"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="server_status">Server Status</p>
+                                        <p id="serverStatus" class="font-semibold text-text-primary" data-lang-key="connected">Connected</p>
+                                    </div>
+                                </div>
+                                <div id="serverStatusIndicator" class="w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="historySection" class="content-section">
+                     <div class="card p-6 relative">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-3xl font-bold text-center relative text-accent-primary">
+                                <span class="relative z-10" data-lang-key="history">History</span>
+                            </h2>
+                            <button id="deleteAllHistoryBtn" class="px-4 py-2 rounded-lg transition flex items-center bg-red-500 hover:bg-red-600 text-white">
+                                <i class="fas fa-trash-alt mr-2"></i><span data-lang-key="delete">Delete</span>
+                            </button>
+                        </div>
+                        <div id="history" class="history-container"></div>
+                    </div>
+                </div>
+                <div id="statsSection" class="content-section">
+                    <div class="card p-6 relative">
+                        <h2 class="text-3xl font-bold text-center mb-4 relative text-accent-primary">
+                            <span class="relative z-10" data-lang-key="statistics">Statistics</span>
+                        </h2>
+                        <div class="analysis-grid">
+                             <div class="dashboard-card">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-history text-accent-primary text-lg"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="last_five_actuals">Last 5 Actuals</p>
+                                        <p id="lastFiveActuals" class="text-xl font-bold text-text-primary">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-check-circle text-win-color text-lg"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="total_wins">Total Wins</p>
+                                        <p id="statsTotalWins" class="text-xl font-bold text-text-primary">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="dashboard-card">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-times-circle text-loss-color text-lg"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="total_losses">Total Losses</p>
+                                        <p id="statsTotalLosses" class="text-xl font-bold text-text-primary">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-percentage text-accent-primary text-lg"></i>
+                                    <div>
+                                        <p class="text-sm text-text-secondary" data-lang-key="accuracy_rate">Accuracy Rate</p>
+                                        <p id="statsAccuracyRate" class="text-xl font-bold text-text-primary">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="aboutSection" class="content-section">
+                     <div class="card p-6 relative">
+                        <h2 class="text-3xl font-bold text-center mb-6 relative text-accent-primary">
+                            <span class="relative z-10" data-lang-key="about_tradex_ai">About TRADE X AI</span>
+                        </h2>
+                         <div class="space-y-6 text-text-secondary"> 
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-text-primary" data-lang-key="data_viewer_intro_title">Our Data Viewer</h3>
+                                <p data-lang-key="data_viewer_intro_p1">
+                                    TRADE X AI connects to data sources to provide real-time and historical results.
+                                </p>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-text-primary" data-lang-key="important_note_title">Important Note</h3>
+                                <p data-lang-key="important_note_p1">
+                                    All data provided by TRADE X AI is for informational and entertainment purposes only. Past performance is not indicative of future results. Please use this information responsibly.
+                                </p>
+                            </div>
+
+                            <div class="pt-4 border-t border-card-border-color"> 
+                                <h3 class="text-xl font-semibold mb-2 text-text-primary" data-lang-key="meet_the_team_title">Meet The Team</h3>
+                                <p class="flex items-center mb-2">
+                                    <i class="fab fa-telegram text-accent-primary mr-2"></i>
+                                    <strong class="text-text-primary">Developer:</strong> <a href="[https://t.me/WEBDEVEXPERT1](https://t.me/WEBDEVEXPERT1)" target="_blank" rel="noopener noreferrer" class="text-accent-primary hover:text-purple-800 underline">@WEBDEVEXPERT1</a>
+                                </p>
+                                <p class="flex items-center">
+                                    <i class="fab fa-telegram text-accent-primary mr-2"></i>
+                                    <strong class="text-text-primary">Owner:</strong> <a href="[https://t.me/TOJI_X_OWNER1](https://t.me/TOJI_X_OWNER1)" target="_blank" rel="noopener noreferrer" class="text-accent-primary hover:text-purple-800 underline">@TOJI_X_OWNER1</a>
+                                </p>
+                            </div>
+
+                             <div class="pt-4 border-t border-card-border-color mt-6">
+                                <h3 class="text-xl font-semibold mb-3 text-text-primary" data-lang-key="general_settings_title">General Settings</h3>
+                                <div class="flex flex-col gap-4">
+                                     <div class="dashboard-card">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fas fa-globe text-lg text-accent-primary"></i>
+                                                <p class="text-sm text-text-secondary" data-lang-key="language">Language</p>
+                                            </div>
+                                            <p class="font-semibold">EN / HI</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="dashboard-card">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fas fa-volume-up text-lg text-accent-primary"></i>
+                                                <p class="text-sm text-text-secondary" data-lang-key="sound">Sound</p>
+                                            </div>
+                                            <button id="soundToggleBtn" class="w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300">
+                                                <div id="soundToggleKnob" class="bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300"></div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                     <div class="dashboard-card cursor-pointer hover:border-accent-primary transition" onclick="TRADEXAI_resetSettings()"> <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fas fa-undo text-lg text-accent-primary"></i>
+                                                <p class="text-sm text-text-secondary" data-lang-key="reset_settings">Reset Settings</p>
+                                            </div>
+                                            <span class="text-sm text-accent-primary font-semibold" data-lang-key="reset">Reset</span>
+                                        </div>
+                                    </div>
+                                    <div class="dashboard-card cursor-pointer hover:border-accent-primary transition" id="logoutBtn">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                 <i class="fas fa-sign-out-alt text-lg text-loss-color"></i>
+                                                <p class="text-sm text-text-secondary">Logout</p>
+                                            </div>
+                                            <span class="text-sm text-loss-color font-semibold">Logout</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-card-border-color mt-6">
+                                <h3 class="text-xl font-semibold mb-3 text-text-primary" data-lang-key="more_info_title">More Information</h3>
+                                <div class="flex flex-col gap-4">
+                                    <div onclick="window.open('[https://tradexai.com/privacy](https://tradexai.com/privacy)', '_blank')" class="dashboard-card cursor-pointer hover:border-accent-primary transition">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="fas fa-shield-alt text-lg text-accent-primary"></i>
+                                                <p class="text-sm text-text-secondary" data-lang-key="privacy_policy">Privacy Policy</p>
+                                            </div>
+                                            <span class="text-sm text-accent-primary font-semibold" data-lang-key="read_more">Read More</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navigation">
+            <ul>
+                <li class="active">
+                    <a href="#" data-section="homeSection">
+                        <span class="icon"><i class="fa-solid fa-house"></i></span>
+                        <span class="text" data-lang-key="home">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="historySection">
+                        <span class="icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                        <span class="text" data-lang-key="history">History</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="statsSection">
+                        <span class="icon"><i class="fa-solid fa-chart-simple"></i></span>
+                        <span class="text" data-lang-key="stats">Stats</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="aboutSection">
+                        <span class="icon"><i class="fa-solid fa-circle-info"></i></span>
+                        <span class="text" data-lang-key="about">About</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div id="confirmModal" class="modal">
+            <h3 class="text-lg font-semibold mb-4 text-text-primary" data-lang-key="confirm_action">Confirm Action</h3>
+            <p id="modalMessage" class="mb-4 text-text-secondary"></p>
+            <div class="flex justify-end space-x-2">
+                <button id="cancelModalBtn" class="px-4 py-2 rounded-lg transition"> <span data-lang-key="cancel">Cancel</span></button>
+                <button id="confirmModalBtn" class="px-4 py-2 rounded-lg transition btn"> <span data-lang-key="confirm">Confirm</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="[https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js](https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js](https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js)"></script>
+    <script>
+        // --- CONFIG & GLOBAL VARIABLES ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV8WCu5kXbs85NtYiwiOtiAsYQ72SA27M",
+            authDomain: "aipredictor-cf4b8.firebaseapp.com",
+            databaseURL: "[https://aipredictor-cf4b8-default-rtdb.firebaseio.com](https://aipredictor-cf4b8-default-rtdb.firebaseio.com)",
+            projectId: "aipredictor-cf4b8",
+            storageBucket: "aipredictor-cf4b8.appspot.com", 
+            messagingSenderId: "1036472549306",
+            appId: "1:1036472549306:web:dc3630c08d41f84369a783",
+            measurementId: "G-0YR80TMFPX" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        
+        let TRADEXAI_currentLanguage = localStorage.getItem('tradeXAiLanguage') || 'en';
+        let TRADEXAI_isSoundEnabled = localStorage.getItem('tradeXAiSound') === 'true';
+        let TRADEXAI_lastFetchedPeriod = null;
+        let TRADEXAI_appHistory = JSON.parse(localStorage.getItem('tradeXAiHistory')) || [];
+        let TRADEXAI_currentSharedStats = JSON.parse(localStorage.getItem('tradeXAiSharedStats')) || {};
+        let audioCtx;
+        let currentDeviceId = null;
+        let approvalCheckInterval = null;
+
+        // --- DOM Elements ---
+        const TRADEXAI_currentPeriodEl = document.getElementById('currentPeriod');
+        const TRADEXAI_currentPredictionEl = document.getElementById('currentPrediction');
+        // Removed TRADEXAI_countdownTimerEl as it's no longer needed
+        const TRADEXAI_mostFrequentBigSmallEl = document.getElementById('mostFrequentBigSmall');
+        const TRADEXAI_leastFrequentBigSmallEl = document.getElementById('leastFrequentBigSmall');
+        const TRADEXAI_serverStatusEl = document.getElementById('serverStatus');
+        const TRADEXAI_serverStatusIndicator = document.getElementById('serverStatusIndicator');
+        const TRADEXAI_historyContainer = document.getElementById('history');
+        const TRADEXAI_lastFiveActualsEl = document.getElementById('lastFiveActuals');
+        const TRADEXAI_statsTotalWinsEl = document.getElementById('statsTotalWins');
+        const TRADEXAI_statsTotalLossesEl = document.getElementById('statsTotalLosses');
+        const TRADEXAI_statsAccuracyRateEl = document.getElementById('statsAccuracyRate');
+        const TRADEXAI_confirmModalEl = document.getElementById('confirmModal');
+        const TRADEXAI_modalMessageEl = document.getElementById('modalMessage');
+        const TRADEXAI_soundToggleBtn = document.getElementById('soundToggleBtn');
+        const TRADEXAI_soundToggleKnob = document.getElementById('soundToggleKnob');
+        
+        // --- TRANSLATIONS ---
+        const TRADEXAI_translations = { 
+             en: {
+                period: "Period", prediction: "Prediction", result: "Result", // Removed countdown
+                analysis_dashboard: "Analysis Dashboard", most_frequent_bs: "Most Frequent (B/S)",
+                least_frequent_bs: "Least Frequent (B/S)", 
+                server_status: "Server Status", connected: "Connected", disconnected: "Disconnected",
+                history: "History", delete: "Delete", statistics: "Statistics",
+                last_five_actuals: "Last 5 Actuals", total_wins: "Total Wins", total_losses: "Total Losses", accuracy_rate: "Accuracy Rate",
+                about: "About", about_tradex_ai: "About TRADE X AI",
+                data_viewer_intro_title: "Our Data Viewer",
+                data_viewer_intro_p1: "TRADE X AI connects to data sources to provide real-time and historical results.",
+                important_note_title: "Important Note",
+                important_note_p1: "All data provided by TRADE X AI is for informational and entertainment purposes only. Past performance is not indicative of future results. Please use this information responsibly.",
+                meet_the_team_title: "Meet The Team", owner_info: "<strong>Owner/Developer:</strong> @TRADEXAIADMIN", owner_telegram: "Telegram Profile",
+                general_settings_title: "General Settings", more_info_title: "More Information",
+                language: "Language", sound: "Sound", reset_settings: "Reset Settings",
+                reset: "Reset", privacy_policy: "Privacy Policy", read_more: "Read More",
+                confirm_action: "Confirm Action", cancel: "Cancel", confirm: "Confirm", 
+                win: "Win", loss: "Loss", pending: "Pending", 'jack win': 'Jack Win',
+                delete_item_confirm: "Are you sure you want to delete this history item?",
+                delete_all_confirm: "Are you sure you want to delete all history items?",
+                reset_settings_confirm: "Are you sure you want to reset all settings to default?",
+                api_error: "API Error. Please try again later.", fetching_data: "Fetching...",
+                no_history: "No history yet."
+            },
+            hi: {
+                period: "अवधि", prediction: "अनुमान", result: "परिणाम", // Removed countdown
+                analysis_dashboard: "विश्लेषण डैशबोर्ड", most_frequent_bs: "सबसे लगातार (बड़ा/छोटा)",
+                least_frequent_bs: "कम से कम लगातार (बड़ा/छोटा)",
+                server_status: "सर्वर स्थिति", connected: "जुड़ा हुआ", disconnected: "डिस्कनेक्ट किया गया",
+                history: "इतिहास", delete: "हटाएं", statistics: "आंकड़े",
+                last_five_actuals: "अंतिम 5 वास्तविक", total_wins: "कुल जीत", total_losses: "कुल हार", accuracy_rate: "सटीकता दर",
+                about: "विवरण", about_tradex_ai: "TRADE X AI के बारे में",
+                data_viewer_intro_title: "हमारा डेटा व्यूअर",
+                data_viewer_intro_p1: "TRADE X AI वास्तविक समय और ऐतिहासिक परिणाम प्रदान करने के लिए डेटा स्रोतों से जुड़ता है।",
+                important_note_title: "महत्वपूर्ण लेख",
+                important_note_p1: "TRADE X AI द्वारा प्रदान किया गया सभी डेटा केवल सूचनात्मक और मनोरंजन प्रयोजनों के लिए है। पिछला प्रदर्शन भविष्य के परिणामों का संकेतक नहीं है। कृपया इस जानकारी का जिम्मेदारी से उपयोग करें।",
+                meet_the_team_title: "टीम से मिलें", owner_info: "<strong>मालिक/डेवलपर:</strong> @TRADEXAIADMIN", owner_telegram: "टेलीग्राम प्रोफाइल",
+                general_settings_title: "सामान्य सेटिंग्स", more_info_title: "और जानकारी",
+                language: "भाषा", sound: "ध्वनि", reset_settings: "सेटिंग्स रीसेट करें",
+                reset: "रीसेट", privacy_policy: "गोपनीयता नीति", read_more: "और पढ़ें",
+                confirm_action: "कार्रवाई की पुष्टि करें", cancel: "रद्द करें", confirm: "पुष्टि करें",
+                win: "जीत", loss: "हार", pending: "लंबित", 'jack win': 'जैक विन',
+                delete_item_confirm: "क्या आप निश्चित रूप से इस इतिहास आइटम को हटाना चाहते हैं?",
+                delete_all_confirm: "क्या आप निश्चित रूप से सभी इतिहास आइटम हटाना चाहते हैं?",
+                reset_settings_confirm: "क्या आप निश्चित रूप में सभी सेटिंग्स को डिफ़ॉल्ट पर रीसेट करना चाहते हैं?",
+                api_error: "एपीआई त्रुटि। कृपया बाद में पुन: प्रयास करें।", fetching_data: "डेटा प्राप्त हो रहा है...",
+                no_history: "अभी तक कोई इतिहास नहीं है।"
+            }
+        };
+        
+        // --- NEW PREDICTION LOGIC (v46.0.0-ats) ---
+        // predictionLogic.js - Frontend-Adapted Refined Supercore Engine with ATS
+        // Version: 46.0.0-ats
+
+        // --- State Persistence (Using Browser localStorage) ---
+        const STATE_STORAGE_KEY = 'prediction_engine_state_v46';
+
+        let signalPerformance = {};
+        let REGIME_SIGNAL_PROFILES = {};
+        let driftDetector = { p_min: Infinity, s_min: Infinity, n: 0, warning_level: 2.0, drift_level: 3.0 };
+        let consecutiveHighConfLosses = 0;
+        let reflexiveCorrectionActive = 0;
+        let engineMode = "NORMAL";
+        let qTable = {}; // State for the Q-Learning model
+
+        /**
+         * Saves the model's learned state to the browser's localStorage.
+         */
+        function saveStateToLocalStorage() {
+            try {
+                const state = {
+                    signalPerformance,
+                    REGIME_SIGNAL_PROFILES,
+                    driftDetector,
+                    consecutiveHighConfLosses,
+                    engineMode,
+                    qTable // Save the Q-table
+                };
+                localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
+                // Also save to the shared stats for use in next fetch cycle
+                localStorage.setItem('tradeXAiSharedStats', JSON.stringify(TRADEXAI_currentSharedStats));
+            } catch (error) {
+                console.error(`[STATE] Error saving state to localStorage: ${error.message}`);
+            }
+        }
+
+        /**
+         * Loads the model's learned state from localStorage. If no state is found, it initializes a new one.
+         */
+        function loadStateFromLocalStorage() {
+            try {
+                const storedState = localStorage.getItem(STATE_STORAGE_KEY);
+                if (storedState) {
+                    const loadedState = JSON.parse(storedState);
+                    signalPerformance = loadedState.signalPerformance || {};
+                    REGIME_SIGNAL_PROFILES = loadedState.REGIME_SIGNAL_PROFILES || {};
+                    driftDetector = loadedState.driftDetector || { p_min: Infinity, s_min: Infinity, n: 0, warning_level: 2.0, drift_level: 3.0 };
+                    consecutiveHighConfLosses = loadedState.consecutiveHighConfLosses || 0;
+                    engineMode = loadedState.engineMode || "NORMAL";
+                    qTable = loadedState.qTable || {};
+                    
+                    if (Object.keys(REGIME_SIGNAL_PROFILES).length === 0) {
+                        initializeRegimeProfiles();
+                    }
+                    console.log(`[STATE] Successfully loaded state from localStorage. Current mode: ${engineMode}`);
+                } else {
+                    console.log("[STATE] No state found in localStorage. Initializing new state.");
+                    initializeRegimeProfiles();
+                }
+            } catch (error) {
+                console.error(`[STATE] Error loading state from localStorage: ${error.message}. Initializing new state.`);
+                initializeRegimeProfiles();
+            }
+        }
+
+        /**
+         * Initializes the regime profiles if no state file is found.
+         */
+        function initializeRegimeProfiles() {
+            REGIME_SIGNAL_PROFILES = {
+                "TREND_STRONG_LOW_VOL": { baseWeightMultiplier: 1.40, activeSignalTypes: ['trend', 'momentum', 'ichimoku', 'volBreak', 'leadLag', 'stateSpace', 'fusion', 'ats'], contextualAggression: 1.40, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "TREND_STRONG_MED_VOL": { baseWeightMultiplier: 1.30, activeSignalTypes: ['trend', 'momentum', 'ichimoku', 'pattern', 'leadLag', 'stateSpace', 'fusion', 'ats'], contextualAggression: 1.30, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "TREND_STRONG_HIGH_VOL": { baseWeightMultiplier: 0.80, activeSignalTypes: ['trend', 'ichimoku', 'entropy', 'volPersist', 'zScore', 'fusion', 'ats'], contextualAggression: 0.80, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "TREND_MOD_LOW_VOL": { baseWeightMultiplier: 1.25, activeSignalTypes: ['trend', 'momentum', 'ichimoku', 'pattern', 'volBreak', 'leadLag', 'stateSpace', 'ats'], contextualAggression: 1.25, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "TREND_MOD_MED_VOL": { baseWeightMultiplier: 1.20, activeSignalTypes: ['trend', 'momentum', 'ichimoku', 'pattern', 'rsi', 'leadLag', 'bayesian', 'fusion', 'ats'], contextualAggression: 1.20, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "TREND_MOD_HIGH_VOL": { baseWeightMultiplier: 0.85, activeSignalTypes: ['trend', 'ichimoku', 'meanRev', 'stochastic', 'volPersist', 'zScore', 'ats'], contextualAggression: 0.85, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "RANGE_LOW_VOL": { baseWeightMultiplier: 1.20, activeSignalTypes: ['meanRev', 'pattern', 'volBreak', 'stochastic', 'harmonic', 'fractalDim', 'zScore', 'bayesian', 'fusion', 'ats'], contextualAggression: 1.20, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "RANGE_MED_VOL": { baseWeightMultiplier: 1.10, activeSignalTypes: ['meanRev', 'pattern', 'stochastic', 'rsi', 'bollinger', 'harmonic', 'zScore', 'ats'], contextualAggression: 1.10, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "RANGE_HIGH_VOL": { baseWeightMultiplier: 0.75, activeSignalTypes: ['meanRev', 'entropy', 'bollinger', 'vwapDev', 'volPersist', 'zScore', 'fusion', 'ats'], contextualAggression: 0.75, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "WEAK_HIGH_VOL": { baseWeightMultiplier: 0.70, activeSignalTypes: ['meanRev', 'entropy', 'stochastic', 'volPersist', 'fractalDim', 'zScore', 'ats'], contextualAggression: 0.70, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "WEAK_MED_VOL": { baseWeightMultiplier: 0.80, activeSignalTypes: ['momentum', 'meanRev', 'pattern', 'rsi', 'fractalDim', 'bayesian', 'ats'], contextualAggression: 0.80, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "WEAK_LOW_VOL": { baseWeightMultiplier: 0.90, activeSignalTypes: ['all'], contextualAggression: 0.90, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 },
+                "DEFAULT": { baseWeightMultiplier: 1.0, activeSignalTypes: ['all'], contextualAggression: 1.0, recentAccuracy: [], totalPredictions: 0, correctPredictions: 0 }
+            };
+        }
+
+
+        // --- Helper Functions ---
+        function getBigSmallFromNumber(number) {
+            if (number === undefined || number === null) return null;
+            const num = parseInt(number);
+            if (isNaN(num)) return null;
+            return num >= 0 && num <= 4 ? 'SMALL' : num >= 5 && num <= 9 ? 'BIG' : null;
+        }
+
+        function getOppositeOutcome(prediction) {
+            return prediction === "BIG" ? "SMALL" : prediction === "SMALL" ? "BIG" : null;
+        }
+
+        function calculateSMA(data, period) {
+            if (!Array.isArray(data) || data.length < period || period <= 0) return null;
+            const relevantData = data.slice(0, period);
+            const sum = relevantData.reduce((a, b) => a + b, 0);
+            return sum / period;
+        }
+
+        function calculateEMA(data, period) {
+            if (!Array.isArray(data) || data.length < period || period <= 0) return null;
+            const k = 2 / (period + 1);
+            const chronologicalData = data.slice().reverse();
+
+            const initialSliceForSma = chronologicalData.slice(0, period);
+            if (initialSliceForSma.length < period) return null;
+
+            let ema = calculateSMA(initialSliceForSma.slice().reverse(), period);
+            if (ema === null && initialSliceForSma.length > 0) {
+                ema = initialSliceForSma.reduce((a, b) => a + b, 0) / initialSliceForSma.length;
+            }
+            if (ema === null) return null;
+
+            for (let i = period; i < chronologicalData.length; i++) {
+                ema = (chronologicalData[i] * k) + (ema * (1 - k));
+            }
+            return ema;
+        }
+
+        function calculateStdDev(data, period) {
+            if (!Array.isArray(data) || data.length < period || period <= 0) return null;
+            const relevantData = data.slice(0, period);
+            if (relevantData.length < 2) return null;
+            const mean = relevantData.reduce((a, b) => a + b, 0) / relevantData.length;
+            const variance = relevantData.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / relevantData.length;
+            return Math.sqrt(variance);
+        }
+
+        function calculateVWAP(data, period) {
+            if (!Array.isArray(data) || data.length < period || period <= 0) return null;
+            const relevantData = data.slice(0, period);
+            let totalPriceVolume = 0;
+            let totalVolume = 0;
+            for (const entry of relevantData) {
+                const price = parseFloat(entry.actualNumber);
+                const volume = parseFloat(entry.volume || 1);
+                if (!isNaN(price) && !isNaN(volume) && volume > 0) {
+                    totalPriceVolume += price * volume;
+                    totalVolume += volume;
+                }
+            }
+            if (totalVolume === 0) return null;
+            return totalPriceVolume / totalVolume;
+        }
+
+        function calculateRSI(data, period) {
+            if (period <= 0) return null;
+            const chronologicalData = data.slice().reverse();
+            if (!Array.isArray(chronologicalData) || chronologicalData.length < period + 1) return null;
+            let gains = 0, losses = 0;
+
+            for (let i = 1; i <= period; i++) {
+                const change = chronologicalData[i] - chronologicalData[i - 1];
+                if (change > 0) gains += change;
+                else losses += Math.abs(change);
+            }
+
+            let avgGain = gains / period;
+            let avgLoss = losses / period;
+
+            for (let i = period + 1; i < chronologicalData.length; i++) {
+                const change = chronologicalData[i] - chronologicalData[i - 1];
+                let currentGain = change > 0 ? change : 0;
+                let currentLoss = change < 0 ? Math.abs(change) : 0;
+                avgGain = (avgGain * (period - 1) + currentGain) / period;
+                avgLoss = (avgLoss * (period - 1) + currentLoss) / period;
+            }
+
+            if (avgLoss === 0) return 100;
+            const rs = avgGain / avgLoss;
+            return 100 - (100 / (1 + rs));
+        }
+
+        function calculateStochastic(data, period, kPeriod) {
+            const chronologicalData = data.slice().reverse();
+            if (!Array.isArray(chronologicalData) || chronologicalData.length < period) return null;
+
+            const kValues = [];
+            for (let i = period - 1; i < chronologicalData.length; i++) {
+                const slice = chronologicalData.slice(i - (period - 1), i + 1);
+                const highestHigh = Math.max(...slice);
+                const lowestLow = Math.min(...slice);
+                const currentClose = slice[slice.length - 1];
+                if (highestHigh === lowestLow) {
+                    kValues.push(50); // Mid-point if no range
+                } else {
+                    kValues.push(((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100);
+                }
+            }
+
+            if (kValues.length < kPeriod) return null;
+
+            const dSlice = kValues.slice(kValues.length - kPeriod);
+            const percentD = dSlice.reduce((a, b) => a + b, 0) / dSlice.length;
+            const percentK = kValues[kValues.length - 1];
+
+            return { k: percentK, d: percentD };
+        }
+
+        function getCurrentISTHour() {
+            try {
+                const now = new Date();
+                const istFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', hour12: false });
+                const istHourString = istFormatter.formatToParts(now).find(part => part.type === 'hour').value;
+                let hour = parseInt(istHourString, 10);
+                if (hour === 24) hour = 0;
+                return { raw: hour, sin: Math.sin(hour / 24 * 2 * Math.PI), cos: Math.cos(hour / 24 * 2 * Math.PI) };
+            } catch (error) {
+                console.error("Error getting IST hour:", error);
+                const hour = new Date().getHours();
+                return { raw: hour, sin: Math.sin(hour / 24 * 2 * Math.PI), cos: Math.cos(hour / 24 * 2 * Math.PI) };
+            }
+        }
+
+        function getPrimeTimeSession(istHour) {
+            if (istHour >= 10 && istHour < 12) return { session: "PRIME_MORNING", aggression: 1.25, confidence: 1.15 };
+            if (istHour >= 13 && istHour < 14) return { session: "PRIME_AFTERNOON_1", aggression: 1.15, confidence: 1.10 };
+            if (istHour >= 15 && istHour < 16) return { session: "PRIME_AFTERNOON_2", aggression: 1.15, confidence: 1.10 };
+            if (istHour >= 17 && istHour < 20) {
+                if (istHour === 19) return { session: "PRIME_EVENING_PEAK", aggression: 1.35, confidence: 1.25 };
+                return { session: "PRIME_EVENING", aggression: 1.30, confidence: 1.20 };
+            }
+            return null;
+        }
+
+        // --- ATS Engine Helper Functions ---
+        const isPrime = num => {
+            for(let i = 2, s = Math.sqrt(num); i <= s; i++)
+                if(num % i === 0) return false; 
+            return num > 1;
+        }
+
+        const fibonacci = num => {
+            if (num < 0) return 0;
+            let a = 0, b = 1;
+            while (b <= num) {
+                if (b === num) return 1;
+                let temp = a + b;
+                a = b;
+                b = temp;
+            }
+            return 0;
+        };
+
+        const calculateLyapunov = (digits) => {
+            // Simplified proxy for Lyapunov exponent based on digit variance
+            if (digits.length < 2) return 0;
+            const mean = digits.reduce((a, b) => a + b, 0) / digits.length;
+            const variance = digits.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / digits.length;
+            return Math.sqrt(variance);
+        };
+
+        // --- ATS (Advanced Trading System) Engine ---
+
+        function analyzePeriodNumerology(periodNumber, baseWeight) {
+            if (!periodNumber) return null;
+            const s = String(periodNumber);
+            const digits = s.slice(-5).split('').map(Number); // Use last 5 digits
+            if (digits.length < 3) return null;
+
+            const sum = digits.reduce((a, b) => a + b, 0);
+            const prod = digits.reduce((a, b) => a * b, 1);
+            const xor = digits.reduce((a, b) => a ^ b, 0);
+            const lastDigit = digits[digits.length - 1];
+            
+            let primeScore = 0;
+            digits.forEach(d => { if(isPrime(d)) primeScore++; });
+
+            let fibScore = 0;
+            digits.forEach(d => { if(fibonacci(d)) fibScore++; });
+
+            const lyap = calculateLyapunov(digits);
+            
+            let bigScore = 0;
+            let smallScore = 0;
+
+            if (sum % 2 === 0) bigScore += sum / 10; else smallScore += sum / 10;
+            if (prod > 100) bigScore += prod / 100; else smallScore += 5;
+            if (xor > 5) bigScore += xor; else smallScore += xor;
+            if (lastDigit > 4) bigScore += lastDigit; else smallScore += (9 - lastDigit);
+            bigScore += primeScore * 5;
+            smallScore += fibScore * 4;
+            if (lyap > 2.5) bigScore += lyap * 2; else smallScore += lyap * 3;
+
+            const prediction = bigScore > smallScore ? "BIG" : "SMALL";
+            const confidence = Math.abs(bigScore - smallScore) / (bigScore + smallScore + 1);
+
+            return { prediction, weight: baseWeight * confidence, source: 'ATS-Numerology' };
+        }
+
+        function analyzeARIMA(history, baseWeight) {
+            const numbers = history.map(entry => parseInt(entry.actualNumber || entry.result)).filter(n => !isNaN(n));
+            if (numbers.length < 10) return null;
+            // Simplified ARIMA(1,1,1) proxy
+            const diffs = [];
+            for (let i = 0; i < 9; i++) {
+                diffs.push(numbers[i] - numbers[i+1]);
+            }
+            const avgDiff = diffs.reduce((a,b) => a+b, 0) / diffs.length;
+            const forecast = numbers[0] + avgDiff;
+            const prediction = forecast > 4.5 ? "BIG" : "SMALL";
+            const confidence = Math.min(1.0, Math.abs(forecast - 4.5) / 4.5);
+            return { prediction, weight: baseWeight * confidence, source: 'ATS-ARIMA' };
+        }
+
+        function analyzeLSTMPattern(history, baseWeight) {
+            const outcomes = history.map(p => getBigSmallFromNumber(p.result)).filter(Boolean);
+            if (outcomes.length < 10) return null;
+            const sequence = outcomes.slice(0, 5).join('');
+            // Simple learned patterns, would be dynamic in a real LSTM
+            const patterns = {
+                'BIGBIGSMALLSMALLBIG': { prediction: 'BIG', conf: 0.8 },
+                'SMALLSMALLBIGBIGSMALL': { prediction: 'SMALL', conf: 0.8 },
+                'BIGSMALLBIGSMALLBIG': { prediction: 'SMALL', conf: 0.75 },
+                'SMALLBIGSMALLBIGSMALL': { prediction: 'BIG', conf: 0.75 }
+            };
+            if (patterns[sequence]) {
+                return {
+                    prediction: patterns[sequence].prediction,
+                    weight: baseWeight * patterns[sequence].conf,
+                    source: 'ATS-LSTM-Pattern'
+                };
+            }
+            return null;
+        }
+
+        function analyzeQLearning(history, baseWeight) {
+            const outcomes = history.map(p => getBigSmallFromNumber(p.result)).filter(Boolean);
+            if (outcomes.length < 5) return null;
+            const state = outcomes.slice(0, 4).join('-'); // State is last 4 outcomes
+            if (!qTable[state]) {
+                qTable[state] = { BIG: 0, SMALL: 0 }; // Initialize Q-values for new state
+            }
+            const qValues = qTable[state];
+            const prediction = qValues.BIG > qValues.SMALL ? "BIG" : "SMALL";
+            const confidence = Math.abs(qValues.BIG - qValues.SMALL) / (Math.abs(qValues.BIG) + Math.abs(qValues.SMALL) + 0.1);
+            
+            // Update Q-table based on last outcome (learning)
+            const lastState = outcomes.slice(1, 5).join('-');
+            const lastAction = outcomes[0];
+            const reward = (lastAction === (getBigSmallFromNumber(history[0].result))) ? 1 : -1;
+            if (qTable[lastState]) {
+                const learningRate = 0.1;
+                const discountFactor = 0.9;
+                const oldQValue = qTable[lastState][lastAction];
+                const nextStateQMax = Math.max(...Object.values(qTable[state]));
+                qTable[lastState][lastAction] = oldQValue + learningRate * (reward + discountFactor * nextStateQMax - oldQValue);
+            }
+            
+            if (confidence < 0.2) return null; // Only predict if there's some conviction
+            return { prediction, weight: baseWeight * confidence, source: 'ATS-Q-Learning' };
+        }
+
+        function applyBayesianAdjustment(bigScore, smallScore) {
+            const priorBig = 0.5, priorSmall = 0.5;
+            if ((bigScore + smallScore) === 0) return { big: 0.5, small: 0.5 };
+            const likelihoodBig = bigScore / (bigScore + smallScore);
+            const likelihoodSmall = 1 - likelihoodBig;
+            
+            const posteriorBig = likelihoodBig * priorBig;
+            const posteriorSmall = likelihoodSmall * priorSmall;
+            
+            const evidence = posteriorBig + posteriorSmall;
+            if (evidence === 0) return { big: 0.5, small: 0.5 };
+            
+            return {
+                big: posteriorBig / evidence,
+                small: posteriorSmall / evidence
+            };
+        }
+
+
+        // --- Market Context, Trend, and Stability Analysis ---
+        function getMarketRegimeAndTrendContext(history, shortMALookback = 5, mediumMALookback = 10, longMALookback = 20) {
+            const baseContext = getTrendContext(history, shortMALookback, mediumMALookback, longMALookback);
+            let macroRegime = "UNCERTAIN";
+            const { strength, volatility } = baseContext;
+            let isTransitioning = false;
+
+            const numbers = history.map(entry => parseInt(entry.actualNumber || entry.result)).filter(n => !isNaN(n));
+
+            if (numbers.length > mediumMALookback + 5) {
+                const prevShortMA = calculateEMA(numbers.slice(1), shortMALookback);
+                const prevMediumMA = calculateEMA(numbers.slice(1), mediumMALookback);
+                const currentShortMA = calculateEMA(numbers, shortMALookback);
+                const currentMediumMA = calculateEMA(numbers, mediumMALookback);
+
+                if (prevShortMA && prevMediumMA && currentShortMA && currentMediumMA) {
+                    if ((prevShortMA <= prevMediumMA && currentShortMA > currentMediumMA) ||
+                        (prevShortMA >= prevMediumMA && currentShortMA < currentMediumMA)) {
+                        isTransitioning = true;
+                    }
+                }
+            }
+
+            if (strength === "STRONG") {
+                if (volatility === "LOW" || volatility === "VERY_LOW") macroRegime = "TREND_STRONG_LOW_VOL";
+                else if (volatility === "MEDIUM") macroRegime = "TREND_STRONG_MED_VOL";
+                else macroRegime = "TREND_STRONG_HIGH_VOL";
+            } else if (strength === "MODERATE") {
+                if (volatility === "LOW" || volatility === "VERY_LOW") macroRegime = "TREND_MOD_LOW_VOL";
+                else if (volatility === "MEDIUM") macroRegime = "TREND_MOD_MED_VOL";
+                else macroRegime = "TREND_MOD_HIGH_VOL";
+                } else if (strength === "RANGING") {
+                if (volatility === "LOW" || volatility === "VERY_LOW") macroRegime = "RANGE_LOW_VOL";
+                else if (volatility === "MEDIUM") macroRegime = "RANGE_MED_VOL";
+                else macroRegime = "RANGE_HIGH_VOL";
+            } else { // WEAK or UNKNOWN
+                if (volatility === "HIGH") macroRegime = "WEAK_HIGH_VOL";
+                else if (volatility === "MEDIUM") macroRegime = "WEAK_MED_VOL";
+                else macroRegime = "WEAK_LOW_VOL";
+            }
+
+            if (isTransitioning && !macroRegime.includes("TRANSITION")) {
+                macroRegime += "_TRANSITION";
+            }
+
+            baseContext.macroRegime = macroRegime;
+            baseContext.isTransitioning = isTransitioning;
+            baseContext.details += `,Regime:${macroRegime}`;
+            return baseContext;
+        }
+
+        function getTrendContext(history, shortMALookback = 5, mediumMALookback = 10, longMALookback = 20) {
+            if (!Array.isArray(history) || history.length < longMALookback) {
+                return { strength: "UNKNOWN", direction: "NONE", volatility: "UNKNOWN", details: "Insufficient history", macroRegime: "UNKNOWN_REGIME", isTransitioning: false };
+            }
+            const numbers = history.map(entry => parseInt(entry.actualNumber || entry.result)).filter(n => !isNaN(n));
+            if (numbers.length < longMALookback) {
+                return { strength: "UNKNOWN", direction: "NONE", volatility: "UNKNOWN", details: "Insufficient numbers", macroRegime: "UNKNOWN_REGIME", isTransitioning: false };
+            }
+
+            const shortMA = calculateEMA(numbers, shortMALookback);
+            const mediumMA = calculateEMA(numbers, mediumMALookback);
+            const longMA = calculateEMA(numbers, longMALookback);
+
+            if (shortMA === null || mediumMA === null || longMA === null) return { strength: "UNKNOWN", direction: "NONE", volatility: "UNKNOWN", details: "MA calculation failed", macroRegime: "UNKNOWN_REGIME", isTransitioning: false };
+
+            let direction = "NONE";
+            let strength = "WEAK";
+            let details = `S:${shortMA.toFixed(1)},M:${mediumMA.toFixed(1)},L:${longMA.toFixed(1)}`;
+
+            const stdDevLong = calculateStdDev(numbers, longMALookback);
+            const epsilon = 0.001;
+            const normalizedSpread = (stdDevLong !== null && stdDevLong > epsilon) ? (shortMA - longMA) / stdDevLong : (shortMA - longMA) / epsilon;
+
+            details += `,NormSpread:${normalizedSpread.toFixed(2)}`;
+
+            if (shortMA > mediumMA && mediumMA > longMA) {
+                direction = "BIG";
+                if (normalizedSpread > 0.80) strength = "STRONG";
+                else if (normalizedSpread > 0.45) strength = "MODERATE";
+                else strength = "WEAK";
+            } else if (shortMA < mediumMA && mediumMA < longMA) {
+                direction = "SMALL";
+                if (normalizedSpread < -0.80) strength = "STRONG";
+                else if (normalizedSpread < -0.45) strength = "MODERATE";
+                else strength = "WEAK";
+            } else {
+                strength = "RANGING";
+                if (shortMA > longMA) direction = "BIG_BIASED_RANGE";
+                else if (longMA > shortMA) direction = "SMALL_BIASED_RANGE";
+            }
+
+            let volatility = "UNKNOWN";
+            const volSlice = numbers.slice(0, Math.min(numbers.length, 30));
+            if (volSlice.length >= 15) {
+                const stdDevVol = calculateStdDev(volSlice, volSlice.length);
+                if (stdDevVol !== null) {
+                    details += ` VolStdDev:${stdDevVol.toFixed(2)}`;
+                    if (stdDevVol > 3.3) volatility = "HIGH";
+                    else if (stdDevVol > 2.0) volatility = "MEDIUM";
+                    else if (stdDevVol > 0.9) volatility = "LOW";
+                    else volatility = "VERY_LOW";
+                }
+            }
+            return { strength, direction, volatility, details, macroRegime: "PENDING_REGIME_CLASSIFICATION", isTransitioning: false };
+        }
+
+        function analyzeRSI(history, period, volatility, baseWeight) {
+            const numbers = history.map(entry => parseInt(entry.actualNumber || entry.result)).filter(n => !isNaN(n));
+            if (numbers.length < period + 1) return null;
+
+            const rsi = calculateRSI(numbers, period);
+            if (rsi === null) return null;
+
+            let prediction = null;
+            let confidence = 0;
+
+            const overbought = volatility === 'HIGH' ? 80 : 70;
+            const oversold = volatility === 'LOW' ? 20 : 30;
+
+            if (rsi > overbought) {
+                prediction = "SMALL";
+                confidence = Math.min(1, (rsi - overbought) / (100 - overbought));
+            } else if (rsi < oversold) {
+                prediction = "BIG";
+                confidence = Math.min(1, (oversold - rsi) / oversold);
+            }
+
+            if (prediction) {
+                return { prediction, weight: baseWeight * confidence, source: `RSI(${period})` };
+            }
+            return null;
+        }
+
+        function analyzeStochastic(history, period, volatility, dPeriod, baseWeight) {
+            const numbers = history.map(entry => parseInt(entry.actualNumber || entry.result)).filter(n => !isNaN(n));
+            if (numbers.length < period + dPeriod) return null;
+
+            const stochastic = calculateStochastic(numbers, period, dPeriod);
+            if (stochastic === null) return null;
+
+            const { k, d } = stochastic;
+
+            let prediction = null;
+            let confidence = 0;
+            const overbought = 80;
+            const oversold = 20;
+
+            // Simple crossover logic
+            if (k < d && (k + d) / 2 > overbought) { // Bearish crossover above overbought
+                prediction = "SMALL";
+                confidence = 0.6;
+            } else if (k > d && (k + d) / 2 < oversold) { // Bullish crossover below oversold
+                prediction = "BIG";
+                confidence = 0.6;
+            } else if (k > overbought && d > overbought) { // In overbought territory
+                prediction = "SMALL";
+                confidence = 0.4;
+            } else if (k < oversold && d < oversold) { // In oversold territory
+                prediction = "BIG";
+                confidence = 0.4;
+            }
+
+            if (prediction) {
+                return { prediction, weight: baseWeight * confidence, source: `Stochastic(${period},${dPeriod})` };
+            }
+            return null;
+        }
+
+        function analyzeIchimokuCloud(history, tenkanPeriod, kijunPeriod, senkouBPeriod, baseWeight) {
+            if (tenkanPeriod <=0 || kijunPeriod <=0 || senkouBPeriod <=0) return null;
+            const chronologicalHistory = history.slice().reverse();
+            const numbers = chronologicalHistory.map(entry => parseInt(entry.actualNumber || entry.result)).filter(n => !isNaN(n));
+
+            if (numbers.length < Math.max(senkouBPeriod, kijunPeriod) + kijunPeriod -1 ) return null;
+
+            const getHighLow = (dataSlice) => {
+                if (!dataSlice || dataSlice.length === 0) return { high: null, low: null };
+                return { high: Math.max(...dataSlice), low: Math.min(...dataSlice) };
+            };
+
+            const tenkanSenValues = [];
+            for (let i = 0; i < numbers.length; i++) {
+                if (i < tenkanPeriod - 1) { tenkanSenValues.push(null); continue; }
+                const { high, low } = getHighLow(numbers.slice(i - tenkanPeriod + 1, i + 1));
+                if (high !== null && low !== null) tenkanSenValues.push((high + low) / 2); else tenkanSenValues.push(null);
+            }
+
+            const kijunSenValues = [];
+            for (let i = 0; i < numbers.length; i++) {
+                if (i < kijunPeriod - 1) { kijunSenValues.push(null); continue; }
+                const { high, low } = getHighLow(numbers.slice(i - kijunPeriod + 1, i + 1));
+                if (high !== null && low !== null) kijunSenValues.push((high + low) / 2); else kijunSenValues.push(null);
+            }
+
+            const currentTenkan = tenkanSenValues[numbers.length - 1];
+            const prevTenkan = tenkanSenValues[numbers.length - 2];
+            const currentKijun = kijunSenValues[numbers.length - 1];
+            const prevKijun = kijunSenValues[numbers.length - 2];
+
+            const senkouSpanAValues = [];
+            for(let i=0; i < numbers.length; i++) {
+                if (tenkanSenValues[i] !== null && kijunSenValues[i] !== null) {
+                    senkouSpanAValues.push((tenkanSenValues[i] + kijunSenValues[i]) / 2);
+                } else {
+                    senkouSpanAValues.push(null);
+                }
+            }
+
+            const senkouSpanBValues = [];
+            for (let i = 0; i < numbers.length; i++) {
+                if (i < senkouBPeriod -1) { senkouSpanBValues.push(null); continue; }
+                const { high, low } = getHighLow(numbers.slice(i - senkouBPeriod + 1, i + 1));
+                if (high !== null && low !== null) senkouSpanBValues.push((high + low) / 2); else senkouSpanBValues.push(null);
+            }
+
+            const currentSenkouA = (numbers.length > kijunPeriod && senkouSpanAValues.length > numbers.length - 1 - kijunPeriod) ? senkouSpanAValues[numbers.length - 1 - kijunPeriod] : null;
+            const currentSenkouB = (numbers.length > kijunPeriod && senkouSpanBValues.length > numbers.length - 1 - kijunPeriod) ? senkouSpanBValues[numbers.length - 1 - kijunPeriod] : null;
+
+
+            const chikouSpan = numbers[numbers.length - 1];
+            const priceKijunPeriodsAgo = numbers.length > kijunPeriod ? numbers[numbers.length - 1 - kijunPeriod] : null;
+
+            const lastPrice = numbers[numbers.length - 1];
+            if (lastPrice === null || currentTenkan === null || currentKijun === null || currentSenkouA === null || currentSenkouB === null || chikouSpan === null || priceKijunPeriodsAgo === null) {
+                return null;
+            }
+
+            let prediction = null;
+            let strengthFactor = 0.3;
+
+            let tkCrossSignal = null;
+            if (prevTenkan !== null && prevKijun !== null) {
+                if (prevTenkan <= prevKijun && currentTenkan > currentKijun) tkCrossSignal = "BIG";
+                else if (prevTenkan >= prevKijun && currentTenkan < currentKijun) tkCrossSignal = "SMALL";
+            }
+
+            const cloudTop = Math.max(currentSenkouA, currentSenkouB);
+            const cloudBottom = Math.min(currentSenkouA, currentSenkouB);
+            let priceVsCloudSignal = null;
+            if (lastPrice > cloudTop) priceVsCloudSignal = "BIG";
+            else if (lastPrice < cloudBottom) priceVsCloudSignal = "SMALL";
+
+            let chikouSignal = null;
+            if (chikouSpan > priceKijunPeriodsAgo) chikouSignal = "BIG";
+            else if (chikouSpan < priceKijunPeriodsAgo) chikouSignal = "SMALL";
+
+            if (tkCrossSignal && tkCrossSignal === priceVsCloudSignal && tkCrossSignal === chikouSignal) {
+                prediction = tkCrossSignal; strengthFactor = 0.95;
+            }
+            else if (priceVsCloudSignal && priceVsCloudSignal === tkCrossSignal && chikouSignal === priceVsCloudSignal) {
+                prediction = priceVsCloudSignal; strengthFactor = 0.85;
+            }
+            else if (priceVsCloudSignal && priceVsCloudSignal === tkCrossSignal) {
+                prediction = priceVsCloudSignal; strengthFactor = 0.7;
+            }
+            else if (priceVsCloudSignal && priceVsCloudSignal === chikouSignal) {
+                prediction = priceVsCloudSignal; strengthFactor = 0.65;
+            }
+            else if (tkCrossSignal && priceVsCloudSignal) {
+                prediction = tkCrossSignal; strengthFactor = 0.55;
+            }
+            else if (priceVsCloudSignal) {
+                prediction = priceVsCloudSignal; strengthFactor = 0.5;
+            }
+
+            if (prediction === "BIG" && lastPrice > currentKijun && prevKijun !== null && numbers[numbers.length-2] <= prevKijun && priceVsCloudSignal === "BIG") {
+                strengthFactor = Math.min(1.0, strengthFactor + 0.15);
+            } else if (prediction === "SMALL" && lastPrice < currentKijun && prevKijun !== null && numbers[numbers.length-2] >= prevKijun && priceVsCloudSignal === "SMALL") {
+                strengthFactor = Math.min(1.0, strengthFactor + 0.15);
+            }
+
+            if (prediction) return { prediction, weight: baseWeight * strengthFactor, source: "Ichimoku" };
+            return null;
+        }
+
+        function calculateEntropyForSignal(outcomes, windowSize) {
+            if (!Array.isArray(outcomes) || outcomes.length < windowSize) return null;
+            const counts = { BIG: 0, SMALL: 0 };
+            outcomes.slice(0, windowSize).forEach(o => { if (o) counts[o] = (counts[o] || 0) + 1; });
+            let entropy = 0;
+            const totalValidOutcomes = counts.BIG + counts.SMALL;
+            if (totalValidOutcomes === 0) return 1;
+            for (let key in counts) {
+                if (counts[key] > 0) { const p = counts[key] / totalValidOutcomes; entropy -= p * Math.log2(p); }
+            }
+            return isNaN(entropy) ? 1 : entropy;
+        }
+
+        function analyzeMarketEntropyState(history, trendContext, stability) {
+            const ENTROPY_WINDOW_SHORT = 10;
+            const ENTROPY_WINDOW_LONG = 25;
+            const VOL_CHANGE_THRESHOLD = 0.3;
+
+            if (history.length < ENTROPY_WINDOW_LONG) return { state: "UNCERTAIN_ENTROPY", details: "Insufficient history for entropy state." };
+
+            const outcomesShort = history.slice(0, ENTROPY_WINDOW_SHORT).map(e => getBigSmallFromNumber(e.result));
+            const outcomesLong = history.slice(0, ENTROPY_WINDOW_LONG).map(e => getBigSmallFromNumber(e.result));
+
+            const entropyShort = calculateEntropyForSignal(outcomesShort, ENTROPY_WINDOW_SHORT);
+            const entropyLong = calculateEntropyForSignal(outcomesLong, ENTROPY_WINDOW_LONG);
+
+            const numbersShort = history.slice(0, ENTROPY_WINDOW_SHORT).map(e => parseInt(e.actualNumber || e.result)).filter(n => !isNaN(n));
+            const numbersLongPrev = history.slice(ENTROPY_WINDOW_SHORT, ENTROPY_WINDOW_SHORT + ENTROPY_WINDOW_SHORT).map(e => parseInt(e.actualNumber || e.result)).filter(n => !isNaN(n));
+
+            let shortTermVolatility = null, prevShortTermVolatility = null;
+            if(numbersShort.length >= ENTROPY_WINDOW_SHORT * 0.8) shortTermVolatility = calculateStdDev(numbersShort, numbersShort.length);
+            if(numbersLongPrev.length >= ENTROPY_WINDOW_SHORT * 0.8) prevShortTermVolatility = calculateStdDev(numbersLongPrev, numbersLongPrev.length);
+
+
+            let state = "STABLE_MODERATE";
+            let details = `E_S:${entropyShort?.toFixed(2)} E_L:${entropyLong?.toFixed(2)} Vol_S:${shortTermVolatility?.toFixed(2)} Vol_P:${prevShortTermVolatility?.toFixed(2)}`;
+
+            if (entropyShort === null || entropyLong === null) return { state: "UNCERTAIN_ENTROPY", details };
+
+            if (entropyShort < 0.5 && entropyLong < 0.6 && shortTermVolatility !== null && shortTermVolatility < 1.5) {
+                state = "ORDERLY";
+            }
+            else if (entropyShort > 0.95 && entropyLong > 0.9) {
+                if (shortTermVolatility && prevShortTermVolatility && shortTermVolatility > prevShortTermVolatility * (1 + VOL_CHANGE_THRESHOLD) && shortTermVolatility > 2.5) {
+                    state = "RISING_CHAOS";
+                } else {
+                    state = "STABLE_CHAOS";
+                }
+            }
+            else if (shortTermVolatility && prevShortTermVolatility) {
+                if (shortTermVolatility > prevShortTermVolatility * (1 + VOL_CHANGE_THRESHOLD) && entropyShort > 0.85 && shortTermVolatility > 2.0) {
+                    state = "RISING_CHAOS";
+                } else if (shortTermVolatility < prevShortTermVolatility * (1 - VOL_CHANGE_THRESHOLD) && entropyLong > 0.85 && entropyShort < 0.80) {
+                    state = "SUBSIDING_CHAOS";
+                }
+            }
+
+            if (!stability.isStable && (state === "ORDERLY" || state === "STABLE_MODERATE")) {
+                state = "POTENTIAL_CHAOS_FROM_INSTABILITY";
+                details += ` | StabilityOverride: ${stability.reason}`;
+            }
+            return { state, details };
+        }
+
+        function analyzeVolatilityTrendFusion(trendContext, marketEntropyState, baseWeight) {
+            const { direction, strength, volatility } = trendContext;
+            const { state: entropy } = marketEntropyState;
+            let prediction = null;
+            let weightFactor = 0;
+            if (strength === 'STRONG' && (volatility === 'LOW' || volatility === 'MEDIUM') && entropy === 'ORDERLY') {
+                prediction = direction.includes('BIG') ? 'BIG' : 'SMALL';
+                weightFactor = 1.4;
+            }
+            else if (strength === 'STRONG' && volatility === 'HIGH' && entropy.includes('CHAOS')) {
+                prediction = direction.includes('BIG') ? 'SMALL' : 'BIG';
+                weightFactor = 1.2;
+            }
+            else if (strength === 'RANGING' && volatility === 'LOW' && entropy === 'ORDERLY') {
+                prediction = Math.random() > 0.5 ? 'BIG' : 'SMALL';
+                weightFactor = 0.8;
+            }
+            if (prediction) {
+                return { prediction, weight: baseWeight * weightFactor, source: 'Vol-Trend-Fusion' };
+            }
+            return null;
+        }
+
+        function analyzeTrendStability(history) {
+            if (!Array.isArray(history) || history.length < 25) {
+                return { isStable: true, reason: "Not enough data for stability check.", details: "", dominance: "NONE" };
+            }
+            const confirmedHistory = history.filter(p => p && (p.resultStatus === "Win" || p.resultStatus === "Loss" || p.resultStatus === "Jack Win") && typeof p.result !== 'undefined' && p.result !== null);
+            if (confirmedHistory.length < 20) return { isStable: true, reason: "Not enough confirmed results.", details: `Confirmed: ${confirmedHistory.length}`, dominance: "NONE" };
+
+            const recentResults = confirmedHistory.slice(0, 20).map(p => getBigSmallFromNumber(p.result)).filter(r => r);
+            if (recentResults.length < 18) return { isStable: true, reason: "Not enough valid B/S for stability.", details: `Valid B/S: ${recentResults.length}`, dominance: "NONE" };
+
+            const bigCount = recentResults.filter(r => r === "BIG").length;
+            const smallCount = recentResults.filter(r => r === "SMALL").length;
+            let outcomeDominance = "NONE";
+
+            if (bigCount / recentResults.length >= 0.85) { // TUNED: Was 0.80
+                outcomeDominance = "BIG_DOMINANCE";
+                return { isStable: false, reason: "Unstable: Extreme Outcome Dominance", details: `BIG:${bigCount}, SMALL:${smallCount} in last ${recentResults.length}`, dominance: outcomeDominance };
+            }
+            if (smallCount / recentResults.length >= 0.85) { // TUNED: Was 0.80
+                outcomeDominance = "SMALL_DOMINANCE";
+                return { isStable: false, reason: "Unstable: Extreme Outcome Dominance", details: `BIG:${bigCount}, SMALL:${smallCount} in last ${recentResults.length}`, dominance: outcomeDominance };
+            }
+
+            const entropy = calculateEntropyForSignal(recentResults, recentResults.length);
+            if (entropy !== null && entropy < 0.40) { // TUNED: Was 0.45
+                return { isStable: false, reason: "Unstable: Very Low Entropy (Highly Predictable/Stuck)", details: `Entropy: ${entropy.toFixed(2)}`, dominance: outcomeDominance };
+            }
+
+            const actualNumbersRecent = confirmedHistory.slice(0, 15).map(p => parseInt(p.actualNumber || p.result)).filter(n => !isNaN(n));
+            if (actualNumbersRecent.length >= 10) {
+                const stdDevNum = calculateStdDev(actualNumbersRecent, actualNumbersRecent.length);
+                if (stdDevNum !== null && stdDevNum > 3.4) { // TUNED: Was 3.3
+                    return { isStable: false, reason: "Unstable: High Numerical Volatility", details: `StdDev: ${stdDevNum.toFixed(2)}`, dominance: outcomeDominance };
+                }
+            }
+            let alternations = 0;
+            for (let i = 0; i < recentResults.length - 1; i++) {
+                if (recentResults[i] !== recentResults[i + 1]) alternations++;
+            }
+            if (alternations / (recentResults.length - 1) > 0.80) { // TUNED: Was 0.75
+                return { isStable: false, reason: "Unstable: Excessive Choppiness", details: `Alternations: ${alternations}/${recentResults.length}`, dominance: outcomeDominance };
+            }
+
+            return { isStable: true, reason: "Trend appears stable.", details: `Entropy: ${entropy !== null ? entropy.toFixed(2) : 'N/A'}`, dominance: outcomeDominance };
+        }
+
+        // --- Dynamic Weighting, Performance Tracking & Meta-Learning ---
+        const PERFORMANCE_WINDOW = 30;
+        const MIN_OBSERVATIONS_FOR_ADJUST = 8;
+        const MAX_WEIGHT_FACTOR = 2.0; 
+        const MIN_WEIGHT_FACTOR = 0.05;
+        const MAX_ALPHA_FACTOR = 1.7; 
+        const MIN_ALPHA_FACTOR = 0.3;
+        const MIN_ABSOLUTE_WEIGHT = 0.0003;
+        const ALPHA_UPDATE_RATE = 0.06;
+        const PROBATION_THRESHOLD_ACCURACY = 0.40;
+        const PROBATION_MIN_OBSERVATIONS = 15;
+        const PROBATION_WEIGHT_CAP = 0.10;
+
+        function getDynamicWeightAdjustment(signalSourceName, baseWeight, currentPeriodFull, currentVolatilityRegime, sessionHistory) {
+            const perf = signalPerformance[signalSourceName];
+            if (!perf) {
+                signalPerformance[signalSourceName] = {
+                    correct: 0, total: 0, recentAccuracy: [],
+                    sessionCorrect: 0, sessionTotal: 0,
+                    lastUpdatePeriod: null, lastActivePeriod: null,
+                    currentAdjustmentFactor: 1.0, alphaFactor: 1.0, longTermImportanceScore: 0.5,
+                    performanceByVolatility: {}, isOnProbation: false
+                };
+                return Math.max(baseWeight, MIN_ABSOLUTE_WEIGHT);
+            }
+
+            if (sessionHistory.length <= 1) {
+                perf.sessionCorrect = 0;
+                perf.sessionTotal = 0;
+            }
+
+            let volatilitySpecificAdjustment = 1.0;
+            if (perf.performanceByVolatility[currentVolatilityRegime] && perf.performanceByVolatility[currentVolatilityRegime].total >= MIN_OBSERVATIONS_FOR_ADJUST / 2.0) {
+                const volPerf = perf.performanceByVolatility[currentVolatilityRegime];
+                const volAccuracy = volPerf.correct / volPerf.total;
+                const volDeviation = volAccuracy - 0.5;
+                volatilitySpecificAdjustment = 1 + (volDeviation * 1.30);
+                volatilitySpecificAdjustment = Math.min(Math.max(volatilitySpecificAdjustment, 0.55), 1.45);
+            }
+
+            let sessionAdjustmentFactor = 1.0;
+            if (perf.sessionTotal >= 3) {
+                const sessionAccuracy = perf.sessionCorrect / perf.sessionTotal;
+                const sessionDeviation = sessionAccuracy - 0.5;
+                sessionAdjustmentFactor = 1 + (sessionDeviation * 1.5);
+                sessionAdjustmentFactor = Math.min(Math.max(sessionAdjustmentFactor, 0.6), 1.4);
+            }
+
+            let finalAdjustmentFactor = perf.currentAdjustmentFactor * perf.alphaFactor * volatilitySpecificAdjustment * sessionAdjustmentFactor * (0.70 + perf.longTermImportanceScore * 0.6);
+
+            if (perf.isOnProbation) {
+                finalAdjustmentFactor = Math.min(finalAdjustmentFactor, PROBATION_WEIGHT_CAP);
+            }
+
+            let adjustedWeight = baseWeight * finalAdjustmentFactor;
+            return Math.max(adjustedWeight, MIN_ABSOLUTE_WEIGHT);
+        }
+
+        function updateSignalPerformance(contributingSignals, actualOutcome, periodFull, currentVolatilityRegime, lastFinalConfidence, concentrationModeActive, marketEntropyState) {
+            if (!actualOutcome || !contributingSignals || contributingSignals.length === 0) return;
+            const isHighConfidencePrediction = lastFinalConfidence > 0.75;
+            const isOverallCorrect = actualOutcome === (lastFinalConfidence > 0.5 ? "BIG" : "SMALL");
+
+            contributingSignals.forEach(signal => {
+                if (!signal || !signal.source) return;
+                const source = signal.source;
+                if (!signalPerformance[source]) {
+                    signalPerformance[source] = {
+                        correct: 0, total: 0, recentAccuracy: [],
+                        sessionCorrect: 0, sessionTotal: 0,
+                        lastUpdatePeriod: null, lastActivePeriod: null,
+                        currentAdjustmentFactor: 1.0, alphaFactor: 1.0, longTermImportanceScore: 0.5,
+                        performanceByVolatility: {}, isOnProbation: false
+                    };
+                }
+
+                if (!signalPerformance[source].performanceByVolatility[currentVolatilityRegime]) {
+                    signalPerformance[source].performanceByVolatility[currentVolatilityRegime] = { correct: 0, total: 0 };
+                }
+
+                if (signalPerformance[source].lastActivePeriod !== periodFull || signalPerformance[source].total === 0) {
+                    signalPerformance[source].total++;
+                    signalPerformance[source].sessionTotal++;
+                    signalPerformance[source].performanceByVolatility[currentVolatilityRegime].total++;
+                    let outcomeCorrect = (signal.prediction === actualOutcome) ? 1 : 0;
+                    if (outcomeCorrect) {
+                        signalPerformance[source].correct++;
+                        signalPerformance[source].sessionCorrect++;
+                        signalPerformance[source].performanceByVolatility[currentVolatilityRegime].correct++;
+                    }
+
+                    let importanceDelta = 0;
+                    if(outcomeCorrect) {
+                        importanceDelta = isHighConfidencePrediction ? 0.05 : 0.025;
+                    } else {
+                        importanceDelta = isHighConfidencePrediction && !isOverallCorrect ? -0.07 : -0.04;
+                    }
+
+                    if (concentrationModeActive || marketEntropyState.includes("CHAOS")) {
+                        importanceDelta *= 1.5;
+                    }
+                    signalPerformance[source].longTermImportanceScore = Math.min(1.0, Math.max(0.0, signalPerformance[source].longTermImportanceScore + importanceDelta));
+
+                    signalPerformance[source].recentAccuracy.push(outcomeCorrect);
+                    if (signalPerformance[source].recentAccuracy.length > PERFORMANCE_WINDOW) {
+                        signalPerformance[source].recentAccuracy.shift();
+                    }
+
+                    if (signalPerformance[source].total >= MIN_OBSERVATIONS_FOR_ADJUST && signalPerformance[source].recentAccuracy.length >= PERFORMANCE_WINDOW / 2) {
+                        const recentCorrectCount = signalPerformance[source].recentAccuracy.reduce((sum, acc) => sum + acc, 0);
+                        const accuracy = recentCorrectCount / signalPerformance[source].recentAccuracy.length;
+                        const deviation = accuracy - 0.5;
+                        let newAdjustmentFactor = 1 + (deviation * 5.0);
+                        newAdjustmentFactor = Math.min(Math.max(newAdjustmentFactor, MIN_WEIGHT_FACTOR), MAX_WEIGHT_FACTOR);
+                        signalPerformance[source].currentAdjustmentFactor = newAdjustmentFactor;
+
+                        if (signalPerformance[source].recentAccuracy.length >= PROBATION_MIN_OBSERVATIONS && accuracy < PROBATION_THRESHOLD_ACCURACY) {
+                            signalPerformance[source].isOnProbation = true;
+                        } else if (accuracy > PROBATION_THRESHOLD_ACCURACY + 0.15) {
+                            signalPerformance[source].isOnProbation = false;
+                        }
+
+                        let alphaLearningRate = ALPHA_UPDATE_RATE * 1.2; 
+                        if (accuracy < 0.35) alphaLearningRate *= 1.8;
+                        else if (accuracy < 0.45) alphaLearningRate *= 1.5;
+
+                        if (newAdjustmentFactor > signalPerformance[source].alphaFactor) {
+                            signalPerformance[source].alphaFactor = Math.min(MAX_ALPHA_FACTOR, signalPerformance[source].alphaFactor + alphaLearningRate * (newAdjustmentFactor - signalPerformance[source].alphaFactor));
+                        } else {
+                            signalPerformance[source].alphaFactor = Math.max(MIN_ALPHA_FACTOR, signalPerformance[source].alphaFactor - alphaLearningRate * (signalPerformance[source].alphaFactor - newAdjustmentFactor));
+                        }
+                    }
+                    signalPerformance[source].lastActivePeriod = periodFull;
+                }
+                signalPerformance[source].lastUpdatePeriod = periodFull;
+            });
+        }
+
+        function detectConceptDrift(isCorrect) {
+            driftDetector.n++;
+            const errorRate = isCorrect ? 0 : 1;
+            const p_i = (driftDetector.n > 1 ? driftDetector.p_i : 0) + (errorRate - (driftDetector.n > 1 ? driftDetector.p_i : 0)) / driftDetector.n;
+            driftDetector.p_i = p_i;
+            const s_i = Math.sqrt(p_i * (1 - p_i) / driftDetector.n);
+
+            if (driftDetector.n > 1 && p_i + s_i < driftDetector.p_min + driftDetector.s_min) {
+                driftDetector.p_min = p_i;
+                driftDetector.s_min = s_i;
+            }
+
+            if (driftDetector.n > 1 && p_i + s_i > driftDetector.p_min + driftDetector.drift_level * driftDetector.s_min) {
+                driftDetector.p_min = Infinity;
+                driftDetector.s_min = Infinity;
+                driftDetector.n = 1;
+                return 'DRIFT';
+            } else if (driftDetector.n > 1 && p_i + s_i > driftDetector.p_min + driftDetector.warning_level * driftDetector.s_min) {
+                return 'WARNING';
+            } else {
+                return 'STABLE';
+            }
+        }
+
+
+        const REGIME_ACCURACY_WINDOW = 35;
+        const REGIME_LEARNING_RATE_BASE = 0.028;
+        let GLOBAL_LONG_TERM_ACCURACY_FOR_LEARNING_RATE = 0.5;
+
+        function updateRegimeProfilePerformance(regime, actualOutcome, predictedOutcome) {
+            if (REGIME_SIGNAL_PROFILES[regime] && predictedOutcome) {
+                const profile = REGIME_SIGNAL_PROFILES[regime];
+                profile.totalPredictions = (profile.totalPredictions || 0) + 1;
+                let outcomeCorrect = (actualOutcome === predictedOutcome) ? 1 : 0;
+                if(outcomeCorrect === 1) profile.correctPredictions = (profile.correctPredictions || 0) + 1;
+
+                profile.recentAccuracy.push(outcomeCorrect);
+                if (profile.recentAccuracy.length > REGIME_ACCURACY_WINDOW) {
+                    profile.recentAccuracy.shift();
+                }
+
+                if (profile.recentAccuracy.length >= REGIME_ACCURACY_WINDOW * 0.7) {
+                    const regimeAcc = profile.recentAccuracy.reduce((a,b) => a+b, 0) / profile.recentAccuracy.length;
+                    let dynamicLearningRateFactor = 1.0 + Math.abs(0.5 - GLOBAL_LONG_TERM_ACCURACY_FOR_LEARNING_RATE) * 0.7;
+                    dynamicLearningRateFactor = Math.max(0.65, Math.min(1.5, dynamicLearningRateFactor));
+                    let currentLearningRate = REGIME_LEARNING_RATE_BASE * dynamicLearningRateFactor;
+                    currentLearningRate = Math.max(0.01, Math.min(0.07, currentLearningRate));
+
+                    if (regimeAcc > 0.62) {
+                        profile.baseWeightMultiplier = Math.min(1.9, profile.baseWeightMultiplier + currentLearningRate);
+                        profile.contextualAggression = Math.min(1.8, profile.contextualAggression + currentLearningRate * 0.5);
+                    } else if (regimeAcc < 0.38) {
+                        profile.baseWeightMultiplier = Math.max(0.20, profile.baseWeightMultiplier - currentLearningRate * 1.3);
+                        profile.contextualAggression = Math.max(0.30, profile.contextualAggression - currentLearningRate * 0.7);
+                    }
+                }
+            }
+        }
+
+        function analyzeSignalConsistency(signals) {
+            if (!signals || signals.length < 3) return { score: 0.70, details: "Too few signals for consistency check" };
+            const validSignals = signals.filter(s => s.prediction);
+            if (validSignals.length < 3) return { score: 0.70, details: "Too few valid signals" };
+            const predictions = { BIG: 0, SMALL: 0 };
+            validSignals.forEach(s => {
+                if (s.prediction === "BIG" || s.prediction === "SMALL") predictions[s.prediction]++;
+            });
+            const totalPredictions = predictions.BIG + predictions.SMALL;
+            if (totalPredictions === 0) return { score: 0.5, details: "No directional signals" };
+            const consistencyScore = Math.max(predictions.BIG, predictions.SMALL) / totalPredictions;
+            return { score: consistencyScore, details: `Overall split B:${predictions.BIG}/S:${predictions.SMALL}` };
+        }
+
+        function analyzePathConfluenceStrength(signals, finalPrediction) {
+            if (!signals || signals.length === 0 || !finalPrediction) return { score: 0, diversePaths: 0, details: "No valid signals or prediction." };
+            const agreeingSignals = signals.filter(s => s.prediction === finalPrediction && s.adjustedWeight > MIN_ABSOLUTE_WEIGHT * 10);
+            if (agreeingSignals.length < 2) {
+                return { score: 0, diversePaths: agreeingSignals.length, details: "Insufficient agreeing signals." };
+            }
+            const signalCategories = new Set();
+            agreeingSignals.forEach(s => {
+                if (s.source.includes("MACD") || s.source.includes("Ichimoku")) signalCategories.add('trend');
+                else if (s.source.includes("Stochastic") || s.source.includes("RSI")) signalCategories.add('momentum');
+                else if (s.source.includes("Bollinger") || s.source.includes("ZScore")) signalCategories.add('meanRev');
+                else if (s.source.includes("Gram") || s.source.includes("Cycle") || s.source.includes("Pattern")) signalCategories.add('pattern');
+                else if (s.source.includes("Vol") || s.source.includes("FractalDim")) signalCategories.add('volatility');
+                else if (s.source.includes("Bayesian") || s.source.includes("Superposition")) signalCategories.add('probabilistic');
+                else signalCategories.add('other');
+            });
+            const diversePathCount = signalCategories.size;
+            let confluenceScore = 0;
+            if (diversePathCount >= 4) confluenceScore = 0.20;
+            else if (diversePathCount === 3) confluenceScore = 0.12;
+            else if (diversePathCount === 2) confluenceScore = 0.05;
+            const veryStrongAgreeingCount = agreeingSignals.filter(s => s.adjustedWeight > 0.10).length;
+            confluenceScore += Math.min(veryStrongAgreeingCount * 0.02, 0.10);
+            return { score: Math.min(confluenceScore, 0.30), diversePaths: diversePathCount, details: `Paths:${diversePathCount},Strong:${veryStrongAgreeingCount}` };
+        }
+
+
+        function checkForAnomalousPerformance(currentSharedStats) {
+            if (reflexiveCorrectionActive > 0) {
+                reflexiveCorrectionActive--;
+                return true;
+            }
+            if (currentSharedStats && typeof currentSharedStats.lastFinalConfidence === 'number' && currentSharedStats.lastActualOutcome) {
+                const lastPredOutcomeBS = getBigSmallFromNumber(currentSharedStats.lastActualOutcome);
+                const lastPredWasCorrect = lastPredOutcomeBS === currentSharedStats.lastPredictedOutcome;
+                const lastPredWasHighConf = currentSharedStats.lastConfidenceLevel === 3;
+                if (lastPredWasHighConf && !lastPredWasCorrect) {
+                    consecutiveHighConfLosses++;
+                } else {
+                    consecutiveHighConfLosses = 0;
+                }
+            }
+            if (consecutiveHighConfLosses >= 2) {
+                reflexiveCorrectionActive = 5;
+                consecutiveHighConfLosses = 0;
+                return true;
+            }
+            return false;
+        }
+
+        function calculateUncertaintyScore(trendContext, stability, marketEntropyState, signalConsistency, pathConfluence, globalAccuracy, isReflexiveCorrection, driftState) {
+            let uncertaintyScore = 0;
+            let reasons = [];
+
+            if (isReflexiveCorrection) {
+                uncertaintyScore += 65; 
+                reasons.push("ReflexiveCorrection");
+            }
+            if(driftState === 'DRIFT') {
+                uncertaintyScore += 60; 
+                reasons.push("ConceptDrift");
+            } else if (driftState === 'WARNING') {
+                uncertaintyScore += 30; 
+                reasons.push("DriftWarning");
+            }
+            if (!stability.isStable) {
+                uncertaintyScore += (stability.reason.includes("Dominance") || stability.reason.includes("Choppiness")) ? 40 : 30;
+                reasons.push(`Instability:${stability.reason}`);
+            }
+            if (marketEntropyState.state.includes("CHAOS")) {
+                uncertaintyScore += marketEntropyState.state === "RISING_CHAOS" ? 35 : 25;
+                reasons.push(marketEntropyState.state);
+            }
+            if (signalConsistency.score < 0.65) {
+                uncertaintyScore += (1 - signalConsistency.score) * 40;
+                reasons.push(`LowConsistency:${signalConsistency.score.toFixed(2)}`);
+            }
+            if (pathConfluence.diversePaths < 3) {
+                uncertaintyScore += (3 - pathConfluence.diversePaths) * 10;
+                reasons.push(`LowConfluence:${pathConfluence.diversePaths}`);
+            }
+            if (trendContext.isTransitioning) {
+                uncertaintyScore += 20;
+                reasons.push("RegimeTransition");
+            }
+            if (trendContext.volatility === "HIGH") {
+                uncertaintyScore += 15;
+                reasons.push("HighVolatility");
+            }
+            if (typeof globalAccuracy === 'number' && globalAccuracy < 0.48) {
+                uncertaintyScore += (0.48 - globalAccuracy) * 120;
+                reasons.push(`LowGlobalAcc:${globalAccuracy.toFixed(2)}`);
+            }
+
+            return { score: uncertaintyScore, reasons: reasons.join(';') };
+        }
+
+        function checkPerformanceAndSetMode(history) {
+            const recentHistory = history.filter(p => p.resultStatus === 'Win' || p.resultStatus === 'Loss' || p.resultStatus === 'Jack Win').slice(0, 20);
+            if (recentHistory.length < 15) {
+                engineMode = "NORMAL"; 
+                return;
+            }
+
+            const wins = recentHistory.filter(p => p.resultStatus === 'Win' || p.resultStatus === 'Jack Win').length;
+            const winRate = wins / recentHistory.length;
+
+            if (winRate < 0.35 && engineMode === "NORMAL") {
+                console.log(`[MODE_SWITCH] Win rate dropped to ${(winRate * 100).toFixed(1)}%. Switching to CONTRARIAN mode.`);
+                engineMode = "CONTRARIAN";
+            } else if (winRate > 0.50 && engineMode === "CONTRARIAN") {
+                console.log(`[MODE_SWITCH] Win rate recovered to ${(winRate * 100).toFixed(1)}%. Switching back to NORMAL mode.`);
+                engineMode = "NORMAL";
+            }
+        }
+
+
+        // --- Main Prediction Function ---
+        function ultraAIPredict(currentSharedHistory, currentSharedStats) {
+            const currentPeriodFull = currentSharedStats?.periodFull || Date.now();
+            const time = getCurrentISTHour();
+            const primeTimeSession = getPrimeTimeSession(time.raw);
+
+            checkPerformanceAndSetMode(currentSharedHistory);
+
+            console.log(`Refined Supercore v46.0.0 Initializing Prediction for period ${currentPeriodFull}. MODE: ${engineMode}`);
+            let masterLogic = [`RScore_v46.0(M:${engineMode})`];
+
+            let primeTimeAggression = 1.0;
+            let primeTimeConfidence = 1.0;
+            if (primeTimeSession) {
+                masterLogic.push(`!!! PRIME TIME ACTIVE: ${primeTimeSession.session} !!!`);
+                primeTimeAggression = primeTimeSession.aggression;
+                primeTimeConfidence = primeTimeSession.confidence;
+            }
+
+            let longTermGlobalAccuracy = currentSharedStats?.longTermGlobalAccuracy || GLOBAL_LONG_TERM_ACCURACY_FOR_LEARNING_RATE;
+            if (currentSharedStats && typeof currentSharedStats.longTermGlobalAccuracy === 'number') {
+                GLOBAL_LONG_TERM_ACCURACY_FOR_LEARNING_RATE = currentSharedStats.longTermGlobalAccuracy;
+                longTermGlobalAccuracy = currentSharedStats.longTermGlobalAccuracy;
+            }
+            
+            const isReflexiveCorrection = checkForAnomalousPerformance(currentSharedStats);
+            if (isReflexiveCorrection) {
+                masterLogic.push(`!!! REFLEXIVE CORRECTION ACTIVE !!! (Countdown: ${reflexiveCorrectionActive})`);
+            }
+            
+            const trendContext = getMarketRegimeAndTrendContext(currentSharedHistory);
+            masterLogic.push(`TrendCtx(Dir:${trendContext.direction},Str:${trendContext.strength},Vol:${trendContext.volatility},Regime:${trendContext.macroRegime})`);
+            
+            const stability = analyzeTrendStability(currentSharedHistory);
+            const marketEntropyAnalysis = analyzeMarketEntropyState(currentSharedHistory, trendContext, stability);
+            masterLogic.push(`MarketEntropy:${marketEntropyAnalysis.state}`);
+            
+            let concentrationModeEngaged = !stability.isStable || isReflexiveCorrection || marketEntropyAnalysis.state.includes("CHAOS");
+            
+            let driftState = 'STABLE';
+            if (currentSharedStats && typeof currentSharedStats.lastActualOutcome !== 'undefined' && currentSharedStats.lastActualOutcome !== null) {
+                const lastPredictionWasCorrect = getBigSmallFromNumber(currentSharedStats.lastActualOutcome) === currentSharedStats.lastPredictedOutcome;
+                driftState = detectConceptDrift(lastPredictionWasCorrect);
+                if (driftState !== 'STABLE') {
+                    masterLogic.push(`!!! DRIFT DETECTED: ${driftState} !!!`);
+                    concentrationModeEngaged = true;
+                }
+            }
+            
+            if (concentrationModeEngaged) masterLogic.push(`ConcentrationModeActive`);
+            
+            const currentVolatilityRegimeForPerf = trendContext.volatility;
+            const currentMacroRegime = trendContext.macroRegime;
+            
+            if (currentSharedStats && currentSharedStats.lastPredictionSignals && currentSharedStats.lastActualOutcome) {
+                updateSignalPerformance(
+                    currentSharedStats.lastPredictionSignals,
+                    getBigSmallFromNumber(currentSharedStats.lastActualOutcome),
+                    currentSharedStats.lastPeriodFull,
+                    currentSharedStats.lastVolatilityRegime || currentVolatilityRegimeForPerf,
+                    currentSharedStats.lastFinalConfidence,
+                    currentSharedStats.lastConcentrationModeEngaged || false,
+                    currentSharedStats.lastMarketEntropyState || "STABLE_MODERATE"
+                );
+                if (currentSharedStats.lastPredictedOutcome) {
+                    updateRegimeProfilePerformance(currentSharedStats.lastMacroRegime, getBigSmallFromNumber(currentSharedStats.lastActualOutcome), currentSharedStats.lastPredictedOutcome);
+                }
+                saveStateToLocalStorage();
+            }
+
+            const confirmedHistory = currentSharedHistory.filter(p => p && p.result !== null && p.result !== undefined);
+            if (confirmedHistory.length < 25) { 
+                masterLogic.push(`InsufficientHistory_ForceRandom`);
+                const finalDecision = Math.random() > 0.5 ? "BIG" : "SMALL";
+                const predictedNumber = finalDecision === 'BIG' ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 5);
+                return {
+                    prediction: finalDecision,
+                    number: predictedNumber,
+                    finalDecision: finalDecision,
+                    finalConfidence: 0.5,
+                    confidenceLevel: 1,
+                    isForcedPrediction: true,
+                    overallLogic: masterLogic.join(' -> '),
+                    source: "InsufficientHistory",
+                    contributingSignals: [],
+                    currentMacroRegime,
+                    concentrationModeEngaged,
+                    predictionQualityScore: 0.01,
+                    lastPredictedOutcome: finalDecision,
+                    lastFinalConfidence: 0.5,
+                    lastConfidenceLevel: 1,
+                    lastMacroRegime: currentMacroRegime,
+                    lastPredictionSignals: [],
+                    lastConcentrationModeEngaged: concentrationModeEngaged,
+                    lastMarketEntropyState: marketEntropyAnalysis.state,
+                    lastVolatilityRegime: trendContext.volatility,
+                    periodFull: currentPeriodFull
+                };
+            }
+
+            let signals = [];
+            const currentRegimeProfile = REGIME_SIGNAL_PROFILES[currentMacroRegime] || REGIME_SIGNAL_PROFILES["DEFAULT"];
+            let regimeContextualAggression = (currentRegimeProfile.contextualAggression || 1.0) * primeTimeAggression;
+
+            if (isReflexiveCorrection || driftState === 'DRIFT') regimeContextualAggression *= 0.25;
+            else if (concentrationModeEngaged) regimeContextualAggression *= 0.6;
+
+            const addSignal = (fn, arg1, signalType, params, baseWeight) => {
+                if (!(currentRegimeProfile.activeSignalTypes.includes('all') || currentRegimeProfile.activeSignalTypes.includes(signalType))) return;
+                const fnArgs = [arg1, ...Object.values(params), baseWeight];
+                if (fn === analyzeRSI || fn === analyzeStochastic) fnArgs.splice(2, 0, trendContext.volatility);
+                if (fn === analyzeVolatilityTrendFusion) fnArgs.splice(1, 0, marketEntropyAnalysis);
+                
+                const result = fn(...fnArgs);
+                if (result && result.weight && result.prediction) {
+                    result.adjustedWeight = getDynamicWeightAdjustment(result.source, result.weight * regimeContextualAggression, currentPeriodFull, currentVolatilityRegimeForPerf, currentSharedHistory);
+                    signals.push(result);
+                }
+            };
+            
+            // --- Signal Generation ---
+            addSignal(analyzeIchimokuCloud, confirmedHistory, 'trend', { tenkanPeriod: 9, kijunPeriod: 26, senkouBPeriod: 52 }, 0.13);
+            addSignal(analyzeRSI, confirmedHistory, 'rsi', { period: 14 }, 0.10);
+            addSignal(analyzeStochastic, confirmedHistory, 'stochastic', { period: 14, dPeriod: 3 }, 0.09);
+            
+            // ATS Engine Signals
+            addSignal(analyzePeriodNumerology, currentPeriodFull, 'ats', {}, 0.20);
+            addSignal(analyzeARIMA, confirmedHistory, 'ats', {}, 0.15);
+            addSignal(analyzeLSTMPattern, confirmedHistory, 'ats', {}, 0.18);
+            addSignal(analyzeQLearning, confirmedHistory, 'ats', {}, 0.12);
+
+            // Meta & Fusion Signals
+            addSignal(analyzeVolatilityTrendFusion, trendContext, 'fusion', { marketEntropyState: marketEntropyAnalysis }, 0.22);
+            
+            const validSignals = signals.filter(s => s?.prediction && s.adjustedWeight > MIN_ABSOLUTE_WEIGHT);
+            masterLogic.push(`ValidSignals(${validSignals.length}/${signals.length})`);
+
+            if (validSignals.length === 0) {
+                masterLogic.push(`NoValidSignals_ForceRandom`);
+                const finalDecision = Math.random() > 0.5 ? "BIG" : "SMALL";
+                const predictedNumber = finalDecision === 'BIG' ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 5);
+                return {
+                     prediction: finalDecision, number: predictedNumber, finalDecision: finalDecision, finalConfidence: 0.5, confidenceLevel: 1, isForcedPrediction: true,
+                     overallLogic: masterLogic.join(' -> '), source: "NoValidSignals", contributingSignals: [], currentMacroRegime,
+                     concentrationModeEngaged, predictionQualityScore: 0.01, lastPredictedOutcome: finalDecision, lastFinalConfidence: 0.5,
+                     lastConfidenceLevel: 1, lastMacroRegime: currentMacroRegime, lastPredictionSignals: [], lastConcentrationModeEngaged: concentrationModeEngaged,
+                     lastMarketEntropyState: marketEntropyAnalysis.state, lastVolatilityRegime: trendContext.volatility, periodFull: currentPeriodFull,
+                };
+            }
+
+            let bigScore = 0; let smallScore = 0;
+            validSignals.forEach(signal => {
+                if (signal.prediction === "BIG") bigScore += signal.adjustedWeight;
+                else if (signal.prediction === "SMALL") smallScore += signal.adjustedWeight;
+            });
+
+            // Apply Bayesian Adjustment at the end
+            const bayesianScores = applyBayesianAdjustment(bigScore, smallScore);
+            bigScore *= (1 + bayesianScores.big - bayesianScores.small);
+            smallScore *= (1 + bayesianScores.small - bayesianScores.big);
+            masterLogic.push(`BayesianAdj(B:${bayesianScores.big.toFixed(2)},S:${bayesianScores.small.toFixed(2)})`);
+
+            const totalScore = bigScore + smallScore;
+            let finalDecision = totalScore > 0 ? (bigScore >= smallScore ? "BIG" : "SMALL") : (Math.random() > 0.5 ? "BIG" : "SMALL");
+            let finalConfidence = totalScore > 0 ? Math.max(bigScore, smallScore) / totalScore : 0.5;
+
+            if (engineMode === "CONTRARIAN") {
+                finalDecision = getOppositeOutcome(finalDecision);
+                masterLogic.push(`!!! CONTRARIAN MODE ACTIVE: Inverting prediction !!!`);
+            }
+
+            finalConfidence = 0.5 + (finalConfidence - 0.5) * primeTimeConfidence;
+
+            const signalConsistency = analyzeSignalConsistency(validSignals);
+            const pathConfluence = analyzePathConfluenceStrength(validSignals, finalDecision);
+            const uncertainty = calculateUncertaintyScore(trendContext, stability, marketEntropyAnalysis, signalConsistency, pathConfluence, longTermGlobalAccuracy, isReflexiveCorrection, driftState);
+
+            const uncertaintyFactor = 1.0 - Math.min(1.0, uncertainty.score / 120.0);
+            finalConfidence = 0.5 + (finalConfidence - 0.5) * uncertaintyFactor;
+            masterLogic.push(`Uncertainty(Score:${uncertainty.score.toFixed(0)},Factor:${uncertaintyFactor.toFixed(2)})`);
+
+            let pqs = 0.5 + (signalConsistency.score - 0.5) * 0.4 + pathConfluence.score * 1.2;
+            pqs = Math.max(0.01, Math.min(0.99, pqs - (uncertainty.score / 500)));
+            masterLogic.push(`PQS:${pqs.toFixed(3)}`);
+
+            let highConfThreshold = 0.75, medConfThreshold = 0.62;
+            let highPqsThreshold = 0.70, medPqsThreshold = 0.58;
+
+            if (primeTimeSession) {
+                highConfThreshold -= 0.05;
+                medConfThreshold -= 0.05;
+                highPqsThreshold -= 0.05;
+                medPqsThreshold -= 0.05;
+            }
+
+            let confidenceLevel = 1;
+            if (finalConfidence > medConfThreshold && pqs > medPqsThreshold) confidenceLevel = 2;
+            if (finalConfidence > highConfThreshold && pqs > highPqsThreshold) confidenceLevel = 3;
+
+            if (confidenceLevel === 1 && trendContext.strength === 'STRONG') {
+                const trendDirection = trendContext.direction.includes("BIG") ? "BIG" : "SMALL";
+                if (finalDecision !== trendDirection) {
+                    masterLogic.push(`!!! L1-Trend-Override: Switched from ${finalDecision} to ${trendDirection} !!!`);
+                    finalDecision = trendDirection;
+                    finalConfidence = Math.max(finalConfidence, 0.55); 
+                }
+            }
+
+            const uncertaintyThreshold = isReflexiveCorrection || driftState === 'DRIFT' ? 85 : 105;
+            const isForced = uncertainty.score >= uncertaintyThreshold || pqs < 0.15;
+            if(isForced) {
+                confidenceLevel = 1;
+                finalConfidence = Math.max(0.5, finalConfidence - 0.1);
+                masterLogic.push(`FORCED_PREDICTION(Uncertainty:${uncertainty.score}/${uncertaintyThreshold},PQS:${pqs})`);
+            }
+            const predictedNumber = finalDecision === 'BIG' ? Math.floor(Math.random() * 5) + 5 : Math.floor(Math.random() * 5);
+
+
+            const output = {
+                prediction: finalDecision,
+                number: predictedNumber,
+                finalDecision, finalConfidence, confidenceLevel, isForcedPrediction: isForced,
+                overallLogic: masterLogic.join(' -> '),
+                source: "RealTimeFusionV46.0-ATS",
+                contributingSignals: validSignals.map(s => ({ source: s.source, prediction: s.prediction, weight: s.adjustedWeight.toFixed(5) })).sort((a,b)=>b.weight-a-b.weight).slice(0, 15),
+                currentMacroRegime, marketEntropyState: marketEntropyAnalysis.state, predictionQualityScore: pqs,
+                lastPredictedOutcome: finalDecision, lastFinalConfidence: finalConfidence, lastConfidenceLevel: confidenceLevel, lastMacroRegime: currentMacroRegime,
+                lastPredictionSignals: validSignals.map(s => ({ source: s.source, prediction: s.prediction, weight: s.weight, isOnProbation: s.isOnProbation || false })),
+                lastConcentrationModeEngaged: concentrationModeEngaged, lastMarketEntropyState: marketEntropyAnalysis.state, lastVolatilityRegime: trendContext.volatility,
+                periodFull: currentPeriodFull, // Ensure periodFull is part of the output
+                lastActualOutcome: null // To be filled in later
+            };
+
+            console.log(`RScore v46.0 ATS Output: ${output.finalDecision} @ ${(output.finalConfidence * 100).toFixed(1)}% | Lvl: ${output.confidenceLevel} | PQS: ${output.predictionQualityScore.toFixed(2)} | Forced: ${output.isForcedPrediction} | Drift: ${driftState}`);
+            return output;
+        }
+
+
+        // --- UI & APP LOGIC ---
+        let TRADEXAI_currentPeriodNumber = null; // Stores the current period number from the timer
+        // Removed TRADEXAI_countdownInterval as it's no longer needed
+
+        function TRADEXAI_showMaintenancePage(message) { 
+            const msgEl = document.getElementById('maintenanceMessage');
+            if (msgEl) msgEl.textContent = message || "The platform is currently under maintenance.";
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('maintenanceContainer').classList.add('active');
+        }
+
+        function TRADEXAI_initializeAppViewer() {
+            loadStateFromLocalStorage();
+            TRADEXAI_updateLanguage(); 
+            TRADEXAI_updateDashboardAndStats();
+            TRADEXAI_updateHistoryUI();
+            TRADEXAI_updateSoundToggleUI();
+            
+            // Removed initialization and starting of the countdown timer
+            // TRADEXAI_updateCountdownAndPeriod();
+            // TRADEXAI_countdownInterval = setInterval(TRADEXAI_updateCountdownAndPeriod, 1000);
+
+            // Set up Firebase listener for predictions
+            db.ref('tradexai_predictions/latest').on('value', (snapshot) => {
+                const latestPrediction = snapshot.val();
+                if (latestPrediction) {
+                    TRADEXAI_displayPrediction(latestPrediction);
+                } else {
+                    TRADEXAI_currentPredictionEl.textContent = TRADEXAI_translations[TRADEXAI_currentLanguage].fetching_data;
+                }
+            }, (error) => {
+                console.error("Firebase prediction listener error:", error);
+                TRADEXAI_currentPredictionEl.textContent = TRADEXAI_translations[TRADEXAI_currentLanguage].api_error;
+            });
+
+            // Fetch actual results periodically
+            setInterval(TRADEXAI_fetchData, 10000); 
+
+            const navItems = document.querySelectorAll('.navigation ul li');
+            const sections = document.querySelectorAll('.content-section');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    const sectionId = item.querySelector('a').getAttribute('data-section');
+                    sections.forEach(section => section.classList.remove('active'));
+                    const targetSection = document.getElementById(sectionId);
+                    if (targetSection) targetSection.classList.add('active');
+                });
+            });
+            
+            const homeNavLi = document.querySelector('.navigation ul li a[data-section="homeSection"]')?.closest('li');
+            if (homeNavLi) {
+                homeNavLi.classList.add('active');
+                document.getElementById('homeSection').classList.add('active');
+            }
+
+            TRADEXAI_soundToggleBtn.addEventListener('click', () => {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                TRADEXAI_isSoundEnabled = !TRADEXAI_isSoundEnabled;
+                localStorage.setItem('tradeXAiSound', TRADEXAI_isSoundEnabled);
+                TRADEXAI_updateSoundToggleUI();
+                TRADEXAI_playSound('confirm');
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', TRADEXAI_handleLogout);
+        }
+
+        function TRADEXAI_updateLanguage() {
+            document.querySelectorAll('[data-lang-key]').forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                const translation = TRADEXAI_translations[TRADEXAI_currentLanguage]?.[key] || TRADEXAI_translations['en'][key];
+                if (translation) {
+                    if (translation.includes('<') && translation.includes('>')) { element.innerHTML = translation; } 
+                    else { element.textContent = translation; }
+                }
+            });
+            const isConnected = TRADEXAI_serverStatusIndicator && TRADEXAI_serverStatusIndicator.classList.contains('bg-green-500');
+            TRADEXAI_updateServerStatusUI(isConnected);
+        }
+
+        function TRADEXAI_playSound(type) {
+            if (!TRADEXAI_isSoundEnabled || !audioCtx) return;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            
+            let freq = 440;
+            if (type === 'win') { freq = 800; }
+            if (type === 'loss') { freq = 200; }
+            if (type === 'confirm') { freq = 600; }
+            if (type === 'jack-win') { freq = 1200; }
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+        
+        // Removed TRADEXAI_updateCountdownAndPeriod function
+        // Function to update the countdown timer and period number
+        /*
+        function TRADEXAI_updateCountdownAndPeriod() {
+            const now = new Date();
+            // Use UTC for consistent period number calculation as per Java code
+            const utcFormatter = new Intl.DateTimeFormat('en-US', { 
+                timeZone: 'UTC', 
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+            });
+            const parts = utcFormatter.formatToParts(now);
+            const getPart = (type) => parts.find(p => p.type === type).value;
+
+            const year = getPart('year');
+            const month = getPart('month');
+            const day = getPart('day');
+            const hour = parseInt(getPart('hour'), 10);
+            const minute = parseInt(getPart('minute'), 10);
+            const second = parseInt(getPart('second'), 10);
+
+            const remainingSeconds = 60 - second;
+            const formattedTime = ` ${String(Math.floor(remainingSeconds / 10)).padStart(1, ' ')} ${String(remainingSeconds % 10).padStart(1, ' ')} : 0 0`; // Simplified to match "x x : x x" format for seconds only
+            TRADEXAI_countdownTimerEl.textContent = formattedTime.replaceAll(" ", "&nbsp;"); // Use non-breaking space for formatting
+
+            // Calculate period number
+            const totalMinutesUTC = hour * 60 + minute;
+            const datePart = `${year}${month}${day}`;
+            const periodBase = BigInt(datePart + '1000'); // Concat "1000"
+            TRADEXAI_currentPeriodNumber = (periodBase + BigInt(10001 + totalMinutesUTC)).toString();
+            TRADEXAI_currentPeriodEl.textContent = TRADEXAI_currentPeriodNumber.slice(-5);
+        }
+        */
+
+        // Fetch game result from API
+        async function TRADEXAI_fetchGameResultsFromAPI() { 
+            try {
+                const requestPayload = { 
+                    pageSize: 10, 
+                    pageNo: 1, 
+                    typeId: 1, 
+                    language: 0, 
+                    random: "4a0522c6ecd8410496260e686be2a57c", 
+                    signature: "334B5E70A0C9B8918B0B15E517E2069C", 
+                    timestamp: Math.floor(Date.now() / 1000) 
+                };
+                const response = await fetch("[https://api.bdg88zf.com/api/webapi/GetNoaverageEmerdList](https://api.bdg88zf.com/api/webapi/GetNoaverageEmerdList)", { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify(requestPayload) 
+                });
+                if (!response.ok) { throw new Error(`API request failed: ${response.status}`); }
+                const data = await response.json();
+                if (data.code !== 0) { throw new Error(`API Error: ${data.msg} (Code: ${data.code})`); }
+                if (data && data.data && data.data.list) {
+                    TRADEXAI_updateServerStatusUI(true);
+                    return data.data.list;
+                }
+                throw new Error("Unexpected API response structure");
+            } catch (error) {
+                console.error("Fetch error:", error);
+                const lang = TRADEXAI_currentLanguage;
+                TRADEXAI_updateServerStatusUI(false, TRADEXAI_translations[lang].api_error);
+                return [];
+            }
+        }
+
+        function TRADEXAI_updateHistory(latestApiResultNumber, periodToUpdate) { 
+            const entryToUpdate = TRADEXAI_appHistory.find(p => p.periodFull === periodToUpdate && p.resultStatus === "Pending");
+            if (entryToUpdate) {
+                entryToUpdate.result = parseInt(latestApiResultNumber);
+                entryToUpdate.resultType = getBigSmallFromNumber(entryToUpdate.result);
+                TRADEXAI_currentSharedStats.lastActualOutcome = entryToUpdate.result;
+
+                if (entryToUpdate.number === entryToUpdate.result) {
+                    entryToUpdate.resultStatus = "Jack Win";
+                    TRADEXAI_playSound('jack-win');
+                } else if (entryToUpdate.prediction === entryToUpdate.resultType) {
+                    entryToUpdate.resultStatus = "Win";
+                    TRADEXAI_playSound('win');
+                } else {
+                    entryToUpdate.resultStatus = "Loss";
+                    TRADEXAI_playSound('loss');
+                }
+            }
+            localStorage.setItem('tradeXAiHistory', JSON.stringify(TRADEXAI_appHistory));
+        }
+
+        // Displays the prediction fetched from Firebase
+        function TRADEXAI_displayPrediction(predictionData) {
+            if (predictionData && predictionData.periodFull && predictionData.prediction) {
+                TRADEXAI_currentPeriodEl.textContent = String(predictionData.periodFull).slice(-5);
+                TRADEXAI_currentPredictionEl.textContent = `${predictionData.prediction} - ${predictionData.number} (Lvl: ${predictionData.confidenceLevel})`;
+            }
+        }
+
+        async function TRADEXAI_fetchData() { 
+            const apiResults = await TRADEXAI_fetchGameResultsFromAPI();
+            if (apiResults.length === 0) { 
+                TRADEXAI_currentPredictionEl.textContent = TRADEXAI_translations[TRADEXAI_currentLanguage].api_error;
+                return; 
+            }
+            const latestApiEntry = apiResults[0]; 
+            const latestApiPeriodFull = latestApiEntry.issueNumber; 
+            const latestApiResultNumber = latestApiEntry.number;
+            
+            // Update the history with the *previous* period's result
+            TRADEXAI_updateHistory(latestApiResultNumber, latestApiPeriodFull);
+            
+            // Determine the next period for which we need a prediction
+            const nextPeriodFull = (BigInt(latestApiPeriodFull) + 1n).toString();
+            
+            // Check Firebase for the latest prediction
+            const latestFirebasePredictionRef = db.ref('tradexai_predictions/latest');
+            const firebaseSnapshot = await latestFirebasePredictionRef.get();
+            const firebasePrediction = firebaseSnapshot.val();
+
+            let predictionToDisplay = null;
+
+            if (firebasePrediction && BigInt(firebasePrediction.periodFull) === BigInt(nextPeriodFull)) {
+                // Prediction for the next period already exists on Firebase, use it
+                predictionToDisplay = firebasePrediction;
+            } else {
+                // No prediction on Firebase for the next period, generate and push
+                TRADEXAI_currentSharedStats.periodFull = nextPeriodFull; // Set for the prediction function
+                const newPredictionResult = ultraAIPredict(TRADEXAI_appHistory, TRADEXAI_currentSharedStats);
+                newPredictionResult.periodFull = nextPeriodFull; // Ensure periodFull is set for Firebase
+                
+                // Try to set the prediction on Firebase. This will trigger the listener for all clients.
+                await latestFirebasePredictionRef.set(newPredictionResult)
+                    .then(() => {
+                        console.log(`Prediction for ${nextPeriodFull} pushed to Firebase.`);
+                        predictionToDisplay = newPredictionResult;
+                    })
+                    .catch(error => {
+                        console.error("Error pushing prediction to Firebase:", error);
+                        // Fallback to local prediction if Firebase push fails
+                        predictionToDisplay = newPredictionResult;
+                    });
+            }
+
+            if (predictionToDisplay) {
+                TRADEXAI_displayPrediction(predictionToDisplay);
+                
+                // Store the new prediction details for the *next* update cycle in local shared stats
+                TRADEXAI_currentSharedStats = {
+                    ...TRADEXAI_currentSharedStats, // carry over existing stats
+                    lastPredictedOutcome: predictionToDisplay.finalDecision,
+                    lastFinalConfidence: predictionToDisplay.finalConfidence,
+                    lastConfidenceLevel: predictionToDisplay.confidenceLevel,
+                    lastMacroRegime: predictionToDisplay.currentMacroRegime,
+                    lastPredictionSignals: predictionToDisplay.contributingSignals, // Use the actual signals from the prediction
+                    lastConcentrationModeEngaged: predictionToDisplay.concentrationModeEngaged,
+                    lastMarketEntropyState: predictionToDisplay.marketEntropyState,
+                    lastVolatilityRegime: predictionToDisplay.lastVolatilityRegime,
+                    lastPeriodFull: latestApiPeriodFull, // The period that just completed
+                    periodFull: nextPeriodFull // The period for which we just made/got a prediction
+                };
+
+                // Add the new prediction to local history if it's not already there as pending
+                const existingPendingForNext = TRADEXAI_appHistory.find(p => p.periodFull === nextPeriodFull);
+                if (!existingPendingForNext) {
+                    const newPendingEntry = { 
+                        periodFull: nextPeriodFull, 
+                        periodDisplay: nextPeriodFull.slice(-5),
+                        prediction: predictionToDisplay.prediction,
+                        number: predictionToDisplay.number,
+                        signals: predictionToDisplay.contributingSignals,
+                        resultStatus: "Pending", 
+                        result: null, 
+                        resultType: null,
+                        timestamp: Date.now()
+                    };
+                    TRADEXAI_appHistory.unshift(newPendingEntry); 
+                    TRADEXAI_appHistory = TRADEXAI_appHistory.slice(0, 100); 
+                }
+            } else {
+                TRADEXAI_currentPredictionEl.textContent = TRADEXAI_translations[TRADEXAI_currentLanguage].api_error;
+            }
+
+            saveStateToLocalStorage(); // This now saves both prediction engine state and shared stats
+            TRADEXAI_updateDashboardAndStats(); 
+            TRADEXAI_updateHistoryUI();
+        }
+
+        function TRADEXAI_updateDashboardAndStats() { 
+            const completedHistory = TRADEXAI_appHistory.filter(p => p.resultStatus === "Win" || p.resultStatus === "Loss" || p.resultStatus === "Jack Win");
+            const wins = completedHistory.filter(p => p.resultStatus === "Win" || p.resultStatus === "Jack Win").length;
+            const losses = completedHistory.filter(p => p.resultStatus === "Loss").length;
+            const total = wins + losses;
+            const accuracy = total > 0 ? ((wins / total) * 100).toFixed(1) : "0.0";
+            TRADEXAI_currentSharedStats.longTermGlobalAccuracy = total > 20 ? wins / total : 0.5;
+            
+            TRADEXAI_statsTotalWinsEl.textContent = wins;
+            TRADEXAI_statsTotalLossesEl.textContent = losses;
+            TRADEXAI_statsAccuracyRateEl.textContent = `${accuracy}%`;
+
+            const lastFiveActuals = TRADEXAI_appHistory.filter(p=>p.result !== null).slice(0, 5).map(p => p.result).join(', ') || '-'; 
+            TRADEXAI_lastFiveActualsEl.textContent = lastFiveActuals;
+
+            const bigSmallCounts = { BIG: 0, SMALL: 0 }; 
+            completedHistory.forEach(entry => { 
+                const bs = getBigSmallFromNumber(entry.result); 
+                if (bs === "BIG") bigSmallCounts.BIG++; 
+                else if (bs === "SMALL") bigSmallCounts.SMALL++; 
+            });
+
+            if (bigSmallCounts.BIG === 0 && bigSmallCounts.SMALL === 0) { 
+                TRADEXAI_mostFrequentBigSmallEl.textContent = '-'; 
+                TRADEXAI_leastFrequentBigSmallEl.textContent = '-'; 
+            } else {
+                TRADEXAI_mostFrequentBigSmallEl.textContent = bigSmallCounts.BIG >= bigSmallCounts.SMALL ? 'BIG' : 'SMALL'; 
+                TRADEXAI_leastFrequentBigSmallEl.textContent = bigSmallCounts.BIG < bigSmallCounts.SMALL ? 'BIG' : 'SMALL';
+            }
+        }
+
+        function TRADEXAI_updateHistoryUI() { 
+            if(!TRADEXAI_historyContainer) return;
+            TRADEXAI_historyContainer.innerHTML = ''; 
+            if (TRADEXAI_appHistory.length === 0) { 
+                TRADEXAI_historyContainer.innerHTML = `<p class="text-center text-text-secondary p-4" data-lang-key="no_history">${TRADEXAI_translations[TRADEXAI_currentLanguage]?.no_history}</p>`; 
+                return; 
+            }
+            TRADEXAI_appHistory.forEach((entry, index) => { 
+                if(!entry) return;
+                let status = (entry.resultStatus || 'pending').toLowerCase();
+                if (status === "jack win") status = "jack-win";
+                
+                let iconClass = 'fas fa-question-circle';
+                if (status === 'win') iconClass = 'fas fa-check-circle';
+                if (status === 'loss') iconClass = 'fas fa-times-circle';
+                if (status === 'jack-win') iconClass = 'fas fa-crown';
+                if (status === 'pending') iconClass = 'fas fa-hourglass-half';
+                const badgeClass = `${status}-icon`;
+
+                const historyItem = document.createElement('div'); 
+                historyItem.className = `history-item ${status} flex items-center justify-between p-4 rounded-xl animate__animated animate__fadeInUp animate__faster`; 
+                historyItem.style.animationDelay = `${index * 0.05}s`;
+                historyItem.innerHTML = `<div class="flex items-center space-x-3 flex-grow"> <div class="status-icon ${badgeClass}"> <i class="${iconClass}"></i></div> <div class="flex-grow"> <p class="text-lg font-semibold text-text-primary">${entry.periodDisplay || 'N/A'}</p> <div class="flex flex-wrap text-sm gap-x-4 text-text-secondary"> <span>Pred: <strong class="text-text-primary font-medium">${entry.prediction} - ${entry.number || ''}</strong></span> ${entry.result !== null ? `<span>Actual: <strong class="text-text-primary font-medium">${entry.result} (${entry.resultType})</strong></span>` : ''} </div> <p class="text-sm capitalize font-medium mt-1 text-${status.replace('-','')}-color">${TRADEXAI_translations[TRADEXAI_currentLanguage]?.[status.replace('-',' ')] || status}</p> </div> </div> <button class="delete-btn" data-index="${index}"> <i class="fas fa-trash-alt text-base"></i></button> `;
+                TRADEXAI_historyContainer.appendChild(historyItem);
+                historyItem.querySelector('.delete-btn').addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    TRADEXAI_showConfirmModal('delete_item_confirm', () => { 
+                        TRADEXAI_appHistory.splice(index, 1); 
+                        localStorage.setItem('tradeXAiHistory', JSON.stringify(TRADEXAI_appHistory)); 
+                        TRADEXAI_updateHistoryUI(); 
+                        TRADEXAI_updateDashboardAndStats(); 
+                        TRADEXAI_playSound('confirm'); 
+                    }); 
+                });
+            });
+        }
+
+        function TRADEXAI_updateServerStatusUI(isConnected, message = null) { 
+            const lang = TRADEXAI_currentLanguage;
+            if(TRADEXAI_serverStatusEl && TRADEXAI_serverStatusIndicator) {
+                if (isConnected) { 
+                    TRADEXAI_serverStatusEl.textContent = message || TRADEXAI_translations[lang]?.connected; 
+                    TRADEXAI_serverStatusIndicator.className = 'w-3 h-3 bg-green-500 rounded-full animate-ping'; 
+                } else { 
+                    TRADEXAI_serverStatusEl.textContent = message || TRADEXAI_translations[lang]?.disconnected; 
+                    TRADEXAI_serverStatusIndicator.className = 'w-3 h-3 bg-red-500 rounded-full'; 
+                }
+            }
+        }
+        
+        function TRADEXAI_updateSoundToggleUI() {
+            if (TRADEXAI_isSoundEnabled) {
+                TRADEXAI_soundToggleBtn.classList.remove('bg-gray-300');
+                TRADEXAI_soundToggleBtn.classList.add('bg-green-500');
+                TRADEXAI_soundToggleKnob.style.transform = 'translateX(1.5rem)';
+            } else {
+                TRADEXAI_soundToggleBtn.classList.add('bg-gray-300');
+                TRADEXAI_soundToggleBtn.classList.remove('bg-green-500');
+                TRADEXAI_soundToggleKnob.style.transform = 'translateX(0)';
+            }
+        }
+
+        let TRADEXAI_currentConfirmCallback = null;
+        function TRADEXAI_showConfirmModal(messageKey, onConfirm) { 
+            const message = TRADEXAI_translations[TRADEXAI_currentLanguage]?.[messageKey];
+            if(TRADEXAI_modalMessageEl) TRADEXAI_modalMessageEl.textContent = message; 
+            if(TRADEXAI_confirmModalEl) TRADEXAI_confirmModalEl.classList.add('active'); 
+            TRADEXAI_currentConfirmCallback = onConfirm; 
+            TRADEXAI_playSound('confirm'); 
+        }
+        function TRADEXAI_resetSettings() { 
+            TRADEXAI_showConfirmModal('reset_settings_confirm', () => { 
+                TRADEXAI_currentLanguage = 'en'; 
+                TRADEXAI_isSoundEnabled = true; 
+                localStorage.setItem('tradeXAiLanguage', TRADEXAI_currentLanguage); 
+                localStorage.setItem('tradeXAiSound', TRADEXAI_isSoundEnabled); 
+                TRADEXAI_updateLanguage(); 
+                TRADEXAI_updateSoundToggleUI();
+            }); 
+        }
+
+        // --- AUTH FUNCTIONS ---
+        const USER_DEVICE_ID_KEY = 'tradeXAiUserDeviceId_v1';
+        const TELEGRAM_USERNAME_KEY = 'tradeXAiTelegramUsername_v1';
+        const LOGGED_IN_KEY = 'tradeXAiLoggedIn_v1';
+
+        function generateUniqueId() {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+
+        function getOrGenerateDeviceId() {
+            let deviceId = localStorage.getItem(USER_DEVICE_ID_KEY);
+            if (!deviceId) {
+                deviceId = "TRX-" + generateUniqueId().substring(0, 12).toUpperCase();
+                localStorage.setItem(USER_DEVICE_ID_KEY, deviceId);
+            }
+            currentDeviceId = deviceId;
+            const deviceIdDisplayEl = document.getElementById('displayedDeviceId');
+            if (deviceIdDisplayEl) deviceIdDisplayEl.textContent = deviceId;
+            return deviceId;
+        }
+        
+        function TRADEXAI_showScreen(screenId) {
+            ['loginPage1', 'loginPage2', 'appContainer', 'maintenanceContainer'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+             const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+             if (screenId === 'appContainer') {
+                document.body.style.justifyContent = 'flex-start';
+            } else {
+                document.body.style.justifyContent = 'center';
+            }
+        }
+
+        async function TRADEXAI_handleSubmitUsername() {
+            const usernameInput = document.getElementById('telegramUsernameInput');
+            const errorEl = document.getElementById('usernameError');
+            const submitBtn = document.getElementById('submitUsernameBtn');
+            const username = usernameInput.value.trim();
+            if (!username) {
+                errorEl.textContent = 'Telegram Username cannot be empty.';
+                errorEl.style.display = 'block';
+                return;
+            }
+            errorEl.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            currentDeviceId = getOrGenerateDeviceId();
+            
+            try {
+                const deviceRef = db.ref(`tradexai_user_access_requests/${currentDeviceId}`);
+                const snapshot = await deviceRef.get();
+                const deviceData = snapshot.val();
+                let updates = {
+                    telegramUsername: username, 
+                    requestedAt: firebase.database.ServerValue.TIMESTAMP,
+                    deviceId: currentDeviceId 
+                };
+                if (!deviceData) {
+                    updates.status = 'pending';
+                }
+                await deviceRef.update(updates);
+                localStorage.setItem(TELEGRAM_USERNAME_KEY, username);
+                TRADEXAI_showScreen('loginPage2');
+                TRADEXAI_updateApprovalStatusUI(updates.status || deviceData?.status || 'pending');
+                TRADEXAI_startApprovalCheck();
+            } catch (error) {
+                console.error("Error submitting username:", error);
+                errorEl.textContent = 'Failed to submit. Check connection or try again.';
+                errorEl.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Continue';
+            }
+        }
+
+        function TRADEXAI_copyDeviceId() {
+            const deviceIdToCopy = document.getElementById('displayedDeviceId').textContent;
+            const feedbackEl = document.getElementById('copyFeedback');
+            document.execCommand('copy'); // Use document.execCommand for clipboard in iframe
+            feedbackEl.classList.add('show');
+            setTimeout(() => feedbackEl.classList.remove('show'), 2000);
+        }
+
+        function TRADEXAI_handleLogout() {
+            localStorage.removeItem(LOGGED_IN_KEY);
+            if (approvalCheckInterval) clearInterval(approvalCheckInterval);
+            TRADEXAI_showScreen('loginPage1');
+        }
+
+        function TRADEXAI_updateApprovalStatusUI(status, message = '') {
+            const container = document.getElementById('approvalStatusContainer');
+            if (!container) return;
+            container.className = 'status-message-container'; // Reset classes
+            let iconHtml = '<i class="fas fa-spinner fa-spin mr-2"></i>';
+            let fullMessage = message || 'Checking status...';
+
+            switch(status) {
+                case 'pending': container.classList.add('status-pending'); iconHtml = '<i class="fas fa-hourglass-half mr-2"></i>'; fullMessage = message || 'Waiting for admin approval...'; break;
+                case 'approved': container.classList.add('status-approved'); iconHtml = '<i class="fas fa-check-circle mr-2"></i>'; fullMessage = message || 'Access Approved! Redirecting...'; break;
+                case 'rejected': container.classList.add('status-rejected'); iconHtml = '<i class="fas fa-times-circle mr-2"></i>'; fullMessage = message || 'Access Denied. Contact admin.'; break;
+                case 'expired': container.classList.add('status-expired'); iconHtml = '<i class="fas fa-clock mr-2"></i>'; fullMessage = message || 'Access Expired. Contact admin.'; break;
+                default: container.classList.add('status-info'); break;
+            }
+            container.innerHTML = `${iconHtml} ${fullMessage}`;
+        }
+
+        function TRADEXAI_startApprovalCheck() {
+            if (approvalCheckInterval) clearInterval(approvalCheckInterval);
+            const check = async () => {
+                if (!currentDeviceId) return;
+                try {
+                    const deviceSnapshot = await db.ref(`tradexai_user_access_requests/${currentDeviceId}`).get();
+                    if (deviceSnapshot.exists()) {
+                        const deviceData = deviceSnapshot.val();
+                        TRADEXAI_updateApprovalStatusUI(deviceData.status);
+                        if (deviceData.status === 'approved') {
+                            clearInterval(approvalCheckInterval);
+                            localStorage.setItem(LOGGED_IN_KEY, 'true');
+                            setTimeout(() => {
+                                TRADEXAI_showScreen('appContainer');
+                                TRADEXAI_initializeAppViewer();
+                            }, 1500);
+                        }
+                    } else {
+                       TRADEXAI_updateApprovalStatusUI('pending', 'Device not registered. Please wait.');
+                    }
+                } catch (error) {
+                    console.error("Error checking approval status:", error);
+                    TRADEXAI_updateApprovalStatusUI('info', 'Error checking status...');
+                }
+            };
+            check();
+            approvalCheckInterval = setInterval(check, 5000);
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // LOGIN LISTENERS
+            document.getElementById('submitUsernameBtn').addEventListener('click', TRADEXAI_handleSubmitUsername);
+            document.getElementById('copyDeviceIdBtn').addEventListener('click', TRADEXAI_copyDeviceId);
+            document.getElementById('logoutFromDevicePageBtn').addEventListener('click', TRADEXAI_handleLogout);
+
+            // GENERAL LISTENERS
+            document.getElementById('deleteAllHistoryBtn').addEventListener('click', () => { TRADEXAI_showConfirmModal('delete_all_confirm', () => { TRADEXAI_appHistory = []; localStorage.setItem('tradeXAiHistory', JSON.stringify(TRADEXAI_appHistory)); TRADEXAI_updateHistoryUI(); TRADEXAI_updateDashboardAndStats(); TRADEXAI_playSound('confirm'); }); });
+            document.getElementById('confirmModalBtn').addEventListener('click', () => { if (TRADEXAI_currentConfirmCallback) TRADEXAI_currentConfirmCallback(); if(TRADEXAI_confirmModalEl) TRADEXAI_confirmModalEl.classList.remove('active'); TRADEXAI_playSound('confirm'); TRADEXAI_currentConfirmCallback = null; });
+            document.getElementById('cancelModalBtn').addEventListener('click', () => { if(TRADEXAI_confirmModalEl) TRADEXAI_confirmModalEl.classList.remove('active'); TRADEXAI_currentConfirmCallback = null; });
+            
+            // INITIALIZATION LOGIC
+            db.ref("tradexai_maintenanceStatus/status").get().then(snapshot => {
+                if (snapshot.val() === true) {
+                    db.ref("tradexai_maintenanceStatus/message").get().then(msgSnapshot => {
+                        TRADEXAI_showMaintenancePage(msgSnapshot.val() || "TRADE X AI is under maintenance.");
+                    });
+                } else {
+                    const isLoggedIn = localStorage.getItem(LOGGED_IN_KEY) === 'true';
+                    if (isLoggedIn) {
+                        TRADEXAI_showScreen('appContainer');
+                        TRADEXAI_initializeAppViewer();
+                    } else {
+                        currentDeviceId = getOrGenerateDeviceId();
+                        const storedUsername = localStorage.getItem(TELEGRAM_USERNAME_KEY);
+                        if (storedUsername) {
+                            document.getElementById('telegramUsernameInput').value = storedUsername;
+                            TRADEXAI_showScreen('loginPage2');
+                            TRADEXAI_startApprovalCheck();
+                        } else {
+                           TRADEXAI_showScreen('loginPage1');
+                        }
+                    }
+                }
+            }).catch(error => {
+                console.error("Error checking maintenance status:", error);
+                TRADEXAI_showScreen('loginPage1'); // Fallback to login if DB check fails
+            });
+        });
+    </script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
+</body>
+</html>
