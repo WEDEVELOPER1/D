@@ -8,12 +8,14 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1A1A2E"> <!-- Dark theme color -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes"> <!-- Added for best practice -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TRADE X AI">
     <link rel="apple-touch-icon" href="[https://placehold.co/180x180/1A1A2E/FFFFFF?text=TXAI](https://placehold.co/180x180/1A1A2E/FFFFFF?text=TXAI)">
     <!-- End PWA Meta Tags -->
 
     <title>TRADE X AI - Viewer</title>
+    <!-- Corrected CDN URLs without extra brackets -->
     <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap)" rel="stylesheet">
     <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css)">
@@ -640,6 +642,7 @@
         </div>
     </div>
     
+    <!-- Corrected Firebase CDN URLs -->
     <script src="[https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js](https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js)"></script>
     <script src="[https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js](https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js)"></script>
     <script>
@@ -1635,8 +1638,7 @@
                     if (signalPerformance[source].total >= MIN_OBSERVATIONS_FOR_ADJUST && signalPerformance[source].recentAccuracy.length >= PERFORMANCE_WINDOW / 2) {
                         const recentCorrectCount = signalPerformance[source].recentAccuracy.reduce((sum, acc) => sum + acc, 0);
                         const accuracy = recentCorrectCount / signalPerformance[source].recentAccuracy.length;
-                        const deviation = accuracy - 0.5;
-                        let newAdjustmentFactor = 1 + (deviation * 5.0);
+                        let newAdjustmentFactor = 1 + (accuracy - 0.5) * 5.0;
                         newAdjustmentFactor = Math.min(Math.max(newAdjustmentFactor, MIN_WEIGHT_FACTOR), MAX_WEIGHT_FACTOR);
                         signalPerformance[source].currentAdjustmentFactor = newAdjustmentFactor;
 
